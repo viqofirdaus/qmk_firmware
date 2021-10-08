@@ -144,9 +144,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 uint16_t key_timer = 0;
 bool alt_tabbing = false;
 bool ctrl_tabbing = false;
-bool ctrl_pressed_after_numpad = false;  // Rolling key on KY_NMPD : KY_NMPD(down) -> KY_LCTL(down) -> KY_NMPD(up) -> KY_LCTL(up)
-bool ctrl_pressed_before_numpad = false; // Rolling key on KY_LCTL : KY_LCTL(down) -> KY_NMPD(down) -> KY_LCTL(up) -> KY_NMPD(up)
-bool shift_pressed_after_numpad = false; // Rolling key on KY_NMPD : KY_NMPD(down) -> KY_LSFT(down) -> KY_NMPD(up) -> KY_LSFT(up)
+bool ctrl_pressed_after_numpad = false;  // Rolling key on KY_NMPD(down) -> KY_LCTL(down) -> KY_NMPD(up) -> KY_LCTL(up) = KC_DEL
+bool ctrl_pressed_before_numpad = false; // Rolling key on KY_LCTL(down) -> KY_NMPD(down) -> KY_LCTL(up) -> KY_NMPD(up) = C(KC_BSPC)
+bool shift_pressed_after_numpad = false; // Rolling key on KY_NMPD(down) -> KY_LSFT(down) -> KY_NMPD(up) -> KY_LSFT(up) = S(KC_9)
 bool other_key_pressed = false;
 bool ky_play_state = false;
 bool layer_mouse_lock = false;
@@ -264,17 +264,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_SWAP);
                 if (!layer_mouse_lock) update_tri_layer(_NUM, _RNAV, _MOUSE);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (ctrl_pressed_after_numpad) {
-                        del_mods(MOD_MASK_CTRL);
-                        tap_code(KC_DEL);
-                        set_mods(mods);
-                    } else if (shift_pressed_after_numpad) tap_code(KC_9); // S(KC_9)
-                    else if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
+                    if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
                         del_mods(MOD_MASK_CTRL);
                         tap_code(KC_HOME);
                         tap_code(KC_BSPC);
                         set_mods(mods);
-                    } else tap_code(KC_BSPC);
+                    } else if (ctrl_pressed_after_numpad) {
+                        del_mods(MOD_MASK_CTRL);
+                        tap_code(KC_DEL);
+                        set_mods(mods);
+                    } else if (shift_pressed_after_numpad) tap_code(KC_9);
+                    else tap_code(KC_BSPC);
                 }
 
                 ctrl_pressed_after_numpad = false;
