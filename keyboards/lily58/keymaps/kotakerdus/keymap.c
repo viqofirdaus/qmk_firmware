@@ -34,21 +34,19 @@ enum custom_keycodes {
 // ---------------------------------------------------------------------------------------------------------------------------------------------
     NM_PLUS,              // KC_PPLS            | KC_PAST if being held (Auto Shift key)
     NM_MINS,              // KC_PMNS            | KC_PSLS if being held (Auto Shift key)
-    NM_COMM,              // KC_COMM            | KC_PDOT if being held (Auto Shift key)
+    NM_DOTC,              // KC_PDOT            | KC_COMM if being held (Auto Shift key)
     NM_ENTR,              // KC_ENT             | KC_EQL  if being held (Auto Shift key)
-    WN_POWR,              // KC_SLEP            | KC_PWR if SHIFT-tapped
+    WN_POWR,              // G(KC_L)            | KC_SLEP if ALT-tapped | KC_PWR if SHIFT-tapped
     MS_MCLK,              // KC_ACL0            | KC_BTN3 if tapped
     MS_LOCK               //                    | Lock _MOUSE layer
 };
 
-#define WN_CLOS A(KC_F4)     // Close current window
-#define WN_LOCK G(KC_L)      // Lock windows session
+#define WN_CLSE A(KC_F4)     // Close current window
 #define BR_NEXT C(KC_TAB)    // Next tab browser shortcut
 #define BR_PREV S(C(KC_TAB)) // Previous tab browser shortcut
 #define AP_SNIP KC_F13       // Snipaste shortcut to take a screenshot
 #define AP_SNHD A(S(KC_F13)) // Snipaste shortcut to hide the screenshot
 #define AP_MTJM A(KC_SLSH)   // VSCode's MetaJump plugin shortcut key
-#define SFT_ENT KC_SFTENT
 
 // K E Y M A P S |------------------------------------------------------------------------------------------------------------------------------
 
@@ -64,7 +62,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              KY_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KY_LALT, KY_LGUI, KY_NMPD, KC_SPC ,       SFT_ENT, KY_RNAV, KY_PLAY, KY_RALT
+                                        KY_LALT, KY_LGUI, KY_NMPD, KC_SPC ,       KC_ENT , KY_RNAV, KY_PLAY, KY_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -78,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, KC_P0  , KC_P1  , KC_P2  , KC_P3  , NM_ENTR, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, NM_COMM, _______, _______,       _______, _______, _______, _______
+                                        _______, NM_DOTC, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -92,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, XXXXXXX, KC_HOME, KC_MPLY, KC_END , _______, _______,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, KC_LGUI, _______, _______,       _______, _______, _______, _______
+                                        _______, KY_LGUI, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -112,13 +110,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_RNAV] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , WN_CLOS,
+             _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , WN_POWR,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , WN_LOCK,
+             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , WN_CLSE,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , WN_POWR,
+             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , MS_LOCK,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, KC_BSPC, KC_END , AP_MTJM, KC_RPRN,
+             _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, XXXXXXX, KC_END , AP_MTJM, KC_RPRN,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, _______, _______, _______,       _______, _______, KC_APP , _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -126,15 +124,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUSE] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, MS_LOCK,
+             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, BR_PREV, KC_MS_U, BR_NEXT, _______,                         _______, KC_WH_L, KC_WH_U, KC_WH_R, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, _______,                         _______, KC_BTN1, MS_MCLK, KC_BTN2, _______, _______,
+             _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, _______,                         _______, KC_BTN1, MS_MCLK, KC_BTN2, KC_LGUI, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______, _______,       _______, _______, KC_BTN4, KC_WH_D, KC_BTN5, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, _______, _______
+                                        _______, KY_LGUI, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     )
 };
@@ -152,7 +150,7 @@ bool ky_play_state = false;
 bool layer_mouse_lock = false;
 bool nm_plus_autoshift = false;
 bool nm_mins_autoshift = false;
-bool nm_comma_autoshift = false;
+bool nm_dotc_autoshift = false;
 bool nm_enter_autoshift = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -355,30 +353,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 nm_mins_autoshift = false;
                 tap_code(KC_PMNS);
             } break;
-        case NM_COMM:
+        case NM_DOTC:
             if (record -> event.pressed) {
                 if (mods & MOD_MASK_SHIFT) {
                     del_mods(MOD_MASK_SHIFT);
-                    tap_code(KC_PDOT);
+                    tap_code(KC_COMM);
                     set_mods(mods);
                     return false;
                 }
 
                 other_key_pressed = true;
-                nm_comma_autoshift = true;
+                nm_dotc_autoshift = true;
                 key_timer = timer_read();
-            } else if (nm_comma_autoshift) {
-                nm_comma_autoshift = false;
-                tap_code(KC_COMM);
+            } else if (nm_dotc_autoshift) {
+                nm_dotc_autoshift = false;
+                tap_code(KC_PDOT);
             } break;
         case NM_ENTR:
             if (record -> event.pressed) {
+                other_key_pressed = true;
                 if (mods & MOD_MASK_SHIFT) {
+                    del_mods(MOD_MASK_SHIFT);
                     tap_code(KC_EQL);
+                    set_mods(mods);
                     return false;
                 }
 
-                other_key_pressed = true;
                 nm_enter_autoshift = true;
                 key_timer = timer_read();
             } else if (nm_enter_autoshift) {
@@ -389,8 +389,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record -> event.pressed) {
                 other_key_pressed = true;
                 layer_mouse_lock = false;
-                if (mods & MOD_MASK_SHIFT) tap_code(KC_PWR);
-                else                       tap_code(KC_SLEP);
+                if (mods & MOD_MASK_ALT)                               tap_code(KC_SLEP);
+                else if (mods & MOD_MASK_ALT && mods & MOD_MASK_SHIFT) tap_code(KC_PWR);
+                else                                                   tap_code16(G(KC_L));
             } break;
         case MS_MCLK:
             if (record -> event.pressed) {
@@ -405,7 +406,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MS_LOCK:
             if (record -> event.pressed) {
                 layer_mouse_lock = !layer_mouse_lock;
-                if (!layer_mouse_lock) update_tri_layer(_NUM, _RNAV, _MOUSE);
+                if (layer_mouse_lock) layer_on(_MOUSE); // This toggle _MOUSE layer if pressed from _RNAV
+                else update_tri_layer(_NUM, _RNAV, _MOUSE);
                 return false;
             }
         default:
@@ -431,10 +433,10 @@ void matrix_scan_user(void) {
             tap_code(KC_PSLS);
             nm_mins_autoshift = false;
         }
-    } else if (nm_comma_autoshift) {
+    } else if (nm_dotc_autoshift) {
         if (timer_elapsed(key_timer) > AUTO_SHIFT_TIMEOUT) {
-            tap_code(KC_PDOT);
-            nm_comma_autoshift = false;
+            tap_code(KC_COMM);
+            nm_dotc_autoshift = false;
         }
     } else if (nm_enter_autoshift) {
         if (timer_elapsed(key_timer) > AUTO_SHIFT_TIMEOUT) {
