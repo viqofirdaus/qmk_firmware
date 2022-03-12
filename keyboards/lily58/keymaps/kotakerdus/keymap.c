@@ -29,18 +29,12 @@ enum custom_keycodes {
     KY_NMPD,              // LT(_NUM, KC_BSPC)  | MO(_SWAP) if any MOD-hold | G(C(KC_RGHT)) if GUI-tapped
     KY_LNAV,              // LT(_LNAV, KC_BPSC) | Custom LT so that it react as soon as user press it to prevent mis-type
     KY_RNAV,              // LT(_RNAV, KC_DEL)  | KC_MPRV if KY_PLAY-tapped
-    KY_PLAY,              // KC_MPLY            & can be combined with KY_RNAV & KY_RALT for media scrubbing/control
-    KY_RALT,              // KC_RALT            | RALT_T(KC_RGHT) if tapped (VSCode cursor navigation shortcut) | KC_MNXT if KY_PLAY-tapped
 // ---------------------------------------------------------------------------------------------------------------------------------------------
-    NM_PLUS,              // KC_PPLS            | KC_PAST if being held (Auto Shift key)
-    NM_MINS,              // KC_PMNS            | KC_PSLS if being held (Auto Shift key)
-    NM_DOTC,              // KC_PDOT            | KC_COMM if being held (Auto Shift key)
-    NM_ENTR,              // KC_ENT             | KC_EQL  if being held (Auto Shift key)
     WN_POWR,              // G(KC_L)            | KC_SLEP if ALT-tapped | KC_PWR if SHIFT-tapped
     MS_MCLK,              // KC_ACL0            | KC_BTN3 if tapped
-    MS_LOCK               //                    | Lock _MOUSE layer
 };
 
+#define SFT_ENT KC_SFTENT    // Space Cadet - Right Shift when held, Enter when tapped
 #define WN_CLSE A(KC_F4)     // Close current window
 #define BR_NEXT C(KC_TAB)    // Next tab browser shortcut
 #define BR_PREV S(C(KC_TAB)) // Previous tab browser shortcut
@@ -62,7 +56,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              KY_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KY_LALT, KY_LGUI, KY_NMPD, KC_SPC ,       KC_ENT , KY_RNAV, KY_PLAY, KY_RALT
+                                        KY_LALT, KY_LGUI, KY_NMPD, KC_SPC ,       SFT_ENT, KY_RNAV, KC_MPLY, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -70,13 +64,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
              KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, AP_SNIP, KC_P7  , KC_P8  , KC_P9  , NM_PLUS,                         _______, _______, _______, _______, _______, _______,
+             _______, AP_SNIP, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KY_LNAV, KC_P4  , KC_P5  , KC_P6  , NM_MINS,                         _______, _______, _______, _______, _______, _______,
+             _______, KY_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_P0  , KC_P1  , KC_P2  , KC_P3  , NM_ENTR, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
+             _______, KC_P0  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, NM_DOTC, _______, _______,       _______, _______, _______, _______
+                                        _______, KC_PDOT, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -114,11 +108,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , WN_CLSE,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , MS_LOCK,
+             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, XXXXXXX, KC_END , AP_MTJM, KC_RPRN,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, KC_APP , _______
+                                        _______, _______, _______, _______,       _______, _______, KC_MPRV, KC_MNXT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -146,12 +140,6 @@ bool ctrl_pressed_after_numpad = false;  // Rolling key on KY_NMPD(down) -> KY_L
 bool ctrl_pressed_before_numpad = false; // Rolling key on KY_LCTL(down) -> KY_NMPD(down) -> KY_LCTL(up) -> KY_NMPD(up) = C(KC_BSPC)
 bool shift_pressed_after_numpad = false; // Rolling key on KY_NMPD(down) -> KY_LSFT(down) -> KY_NMPD(up) -> KY_LSFT(up) = S(KC_9)
 bool other_key_pressed = false;
-bool ky_play_state = false;
-bool layer_mouse_lock = false;
-bool nm_plus_autoshift = false;
-bool nm_mins_autoshift = false;
-bool nm_dotc_autoshift = false;
-bool nm_enter_autoshift = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     uint8_t mods = get_mods();
@@ -252,15 +240,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
                 key_timer = timer_read();
                 if ((mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT)) > 0) layer_on(_SWAP);
-                else {
-                    layer_on(_NUM);
-                    if (!layer_mouse_lock) update_tri_layer(_NUM, _RNAV, _MOUSE);
-                }
+                else layer_on(_NUM);
             } else {
                 layer_off(_NUM);
                 layer_off(_LNAV);
                 layer_off(_SWAP);
-                if (!layer_mouse_lock) update_tri_layer(_NUM, _RNAV, _MOUSE);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
                         del_mods(MOD_MASK_CTRL);
@@ -282,113 +266,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KY_RNAV:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                if (ky_play_state) register_code(KC_MPRV);
-                else {
-                    key_timer = timer_read();
-                    layer_on(_RNAV);
-                    if (!layer_mouse_lock) update_tri_layer(_NUM, _RNAV, _MOUSE);
-                }
+                key_timer = timer_read();
+                layer_on(_RNAV);
             } else {
-                if (ky_play_state) unregister_code(KC_MPRV);
-                else {
-                    layer_off(_RNAV);
-                    if (!layer_mouse_lock) update_tri_layer(_NUM, _RNAV, _MOUSE);
-                    if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                        if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
-                            del_mods(MOD_MASK_CTRL);
-                            tap_code(KC_END);
-                            tap_code(KC_DEL);
-                            set_mods(mods);
-                        } else tap_code(KC_DEL);
-                    }
+                layer_off(_RNAV);
+                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
+                    if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
+                        del_mods(MOD_MASK_CTRL);
+                        tap_code(KC_END);
+                        tap_code(KC_DEL);
+                        set_mods(mods);
+                    } else tap_code(KC_DEL);
                 }
 
                 other_key_pressed = true;
-            } break;
-        case KY_PLAY:
-            if (record -> event.pressed) {
-                other_key_pressed = false;
-                ky_play_state = true;
-            } else {
-                if (!other_key_pressed) tap_code(KC_MPLY);
-                ky_play_state = false;
-            } break;
-        case KY_RALT:
-            if (record -> event.pressed) {
-                other_key_pressed = true;
-                if (ky_play_state) register_code(KC_MNXT);
-                else register_code(KC_RALT);
-            } else {
-                if (ky_play_state) unregister_code(KC_MNXT);
-                else {
-                    unregister_code(KC_RALT);
-                    alt_tabbing = false;
-                }
-            } break;
-        case NM_PLUS:
-            if (record -> event.pressed) {
-                if (mods & MOD_MASK_SHIFT) {
-                    tap_code(KC_PAST);
-                    return false;
-                }
-
-                other_key_pressed = true;
-                nm_plus_autoshift = true;
-                key_timer = timer_read();
-            } else if (nm_plus_autoshift) {
-                nm_plus_autoshift = false;
-                tap_code(KC_PPLS);
-            } break;
-        case NM_MINS:
-            if (record -> event.pressed) {
-                if (mods & MOD_MASK_SHIFT) {
-                    tap_code(KC_PSLS);
-                    return false;
-                }
-
-                other_key_pressed = true;
-                nm_mins_autoshift = true;
-                key_timer = timer_read();
-            } else if (nm_mins_autoshift) {
-                nm_mins_autoshift = false;
-                tap_code(KC_PMNS);
-            } break;
-        case NM_DOTC:
-            if (record -> event.pressed) {
-                if (mods & MOD_MASK_SHIFT) {
-                    del_mods(MOD_MASK_SHIFT);
-                    tap_code(KC_COMM);
-                    set_mods(mods);
-                    return false;
-                }
-
-                other_key_pressed = true;
-                nm_dotc_autoshift = true;
-                key_timer = timer_read();
-            } else if (nm_dotc_autoshift) {
-                nm_dotc_autoshift = false;
-                tap_code(KC_PDOT);
-            } break;
-        case NM_ENTR:
-            if (record -> event.pressed) {
-                other_key_pressed = true;
-                if (mods & MOD_MASK_SHIFT) {
-                    del_mods(MOD_MASK_SHIFT);
-                    tap_code(KC_EQL);
-                    set_mods(mods);
-                    return false;
-                }
-
-                nm_enter_autoshift = true;
-                key_timer = timer_read();
-            } else if (nm_enter_autoshift) {
-                nm_enter_autoshift = false;
-                tap_code(KC_ENT);
             } break;
         case WN_POWR:
             if (record -> event.pressed) {
                 other_key_pressed = true;
-                layer_mouse_lock = false;
                 if (mods & MOD_MASK_ALT)                               tap_code(KC_SLEP);
                 else if (mods & MOD_MASK_ALT && mods & MOD_MASK_SHIFT) tap_code(KC_PWR);
                 else                                                   tap_code16(G(KC_L));
@@ -403,13 +298,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_BTN3);
                 other_key_pressed = true;
             } break;
-        case MS_LOCK:
-            if (record -> event.pressed) {
-                layer_mouse_lock = !layer_mouse_lock;
-                if (layer_mouse_lock) layer_on(_MOUSE); // This toggle _MOUSE layer if pressed from _RNAV
-                else update_tri_layer(_NUM, _RNAV, _MOUSE);
-                return false;
-            }
         default:
             other_key_pressed = true;
             ctrl_pressed_after_numpad = false;
@@ -421,30 +309,49 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 };
 
-// Workaround to mimic AutoShift (trigger the second key if it pressed above the given time) on cutom key
-void matrix_scan_user(void) {
-    if (nm_plus_autoshift) {
-        if (timer_elapsed(key_timer) > AUTO_SHIFT_TIMEOUT) {
-            tap_code(KC_PAST);
-            nm_plus_autoshift = false;
-        }
-    } else if (nm_mins_autoshift) {
-        if (timer_elapsed(key_timer) > AUTO_SHIFT_TIMEOUT) {
-            tap_code(KC_PSLS);
-            nm_mins_autoshift = false;
-        }
-    } else if (nm_dotc_autoshift) {
-        if (timer_elapsed(key_timer) > AUTO_SHIFT_TIMEOUT) {
-            tap_code(KC_COMM);
-            nm_dotc_autoshift = false;
-        }
-    } else if (nm_enter_autoshift) {
-        if (timer_elapsed(key_timer) > AUTO_SHIFT_TIMEOUT) {
-            tap_code(KC_EQL);
-            nm_enter_autoshift = false;
-        }
+// Custom Auto Shift - https://docs.qmk.fm/#/feature_auto_shift
+bool get_custom_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_PPLS:
+        case KC_PMNS:
+        case KC_PENT:
+        case KC_PDOT:
+            return true;
+        default:
+            return false;
     }
-};
+}
+
+void autoshift_press_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_PPLS: register_code16((!shifted) ? KC_PPLS : KC_PAST); break;
+        case KC_PMNS: register_code16((!shifted) ? KC_PMNS : KC_PSLS); break;
+        case KC_PENT: register_code16((!shifted) ? KC_PENT : KC_EQL); break;
+        case KC_PDOT: register_code16((!shifted) ? KC_PDOT : KC_COMM); break;
+        default:
+            if (shifted) add_weak_mods(MOD_BIT(KC_LSFT));
+            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
+            register_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
+}
+
+void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_PPLS: unregister_code16((!shifted) ? KC_PPLS : KC_PAST); break;
+        case KC_PMNS: unregister_code16((!shifted) ? KC_PMNS : KC_PSLS); break;
+        case KC_PENT: unregister_code16((!shifted) ? KC_PENT : KC_EQL); break;
+        case KC_PDOT: unregister_code16((!shifted) ? KC_PDOT : KC_COMM); break;
+        default:
+            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
+            // The IS_RETRO check isn't really necessary here, always using
+            // keycode & 0xFF would be fine.
+            unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+  return update_tri_layer_state(state, _NUM, _RNAV, _MOUSE);
+}
 
 // O L E D   I N T E R F A C E |----------------------------------------------------------------------------------------------------------------
 
@@ -511,8 +418,7 @@ void render_master(void) {
     static const char PROGMEM mod_ctrl[2][3]  = {{ 0xba, 0xbb, 0 }, { 0xda, 0xdb, 0 }};
 
     oled_write_P(lily58, false);
-    if (layer_mouse_lock)                                     oled_write_P(separator[2], false);
-    else if (host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) oled_write_P(separator[1], false);
+    if (host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) oled_write_P(separator[1], false);
     else                                                      oled_write_P(separator[0], false);
 
     if (layer_state_is(_MOUSE))                              oled_write_P(layer_state[4], false);
@@ -536,9 +442,10 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return is_keyboard_master() ? OLED_ROTATION_270 : OLED_ROTATION_180;
 };
 
-void oled_task_user(void) {
+bool oled_task_user(void) {
     if (is_keyboard_master()) render_master();
     else                      render_tawheed();
+    return false;
 };
 
 void suspend_power_down_user(void) {
