@@ -13,7 +13,7 @@
 
 enum layer_number {
     _QWERTY = 0,
-    _NUM, _LNAV, _SWAP, _RNAV, _MOUSE
+    _SWAP, _NUM, _LNAV, _RNAV, _MOUSE
 };
 
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
@@ -21,17 +21,17 @@ enum layer_number {
 enum custom_keycodes {
     KY_GRAV = SAFE_RANGE, // KC_GRV             | G(S(KC_RGHT)) if GUI-tapped (move window to next monitor) | +SHIFT in alt/ctrl_tabbing
     KY_TABS,              // KC_TAB             & as alt/ctrl_tabbing initiator key
-    KY_LCTL,              // KC_LCTL            | KC_DEL in _NUM layer & in alt/ctrl_tabbing if tapped | KC_CAPS if GUI-tapped
+    KY_LCTL,              // KC_LCTL            | KC_CAPS if GUI-tapped
     KY_LSFT,              // KC_LSFT            | S(KC_9) in _NUM layer if tapped
 // ---------------------------------------------------------------------------------------------------------------------------------------------
     KY_LALT,              // KC_LALT            | G(C(KC_LEFT)) if GUI-tapped
-    KY_LGUI,              // KC_LGUI            | Work in tandem with KY_LCTL but it also register KC_CAPS if this key is released first
-    KY_NMPD,              // LT(_NUM, KC_BSPC)  | MO(_SWAP) if any MOD-hold | G(C(KC_RGHT)) if GUI-tapped
-    KY_LNAV,              // LT(_LNAV, KC_BPSC) | Custom LT so that it react as soon as user press it to prevent mis-type
-    KY_RNAV,              // LT(_RNAV, KC_DEL)  | KC_MPRV if KY_PLAY-tapped
+    KY_LGUI,              // KC_LGUI            | KC_CAPS if CTRL-tapped
+    KY_NMPD,              // LT(_NUM, KC_BSPC)  | G(C(KC_RGHT)) if GUI-tapped
+    KY_LNAV,              // LT(_LNAV, KC_BPSC)
+    KY_RNAV,              // LT(_RNAV, KC_DEL)
 // ---------------------------------------------------------------------------------------------------------------------------------------------
     WN_POWR,              // G(KC_L)            | KC_SLEP if ALT-tapped | KC_PWR if SHIFT-tapped
-    MS_MCLK,              // KC_ACL0            | KC_BTN3 if tapped
+    MS_MCLK               // KC_ACL0            | KC_BTN3 if tapped
 };
 
 #define SFT_ENT KC_SFTENT    // Space Cadet - Right Shift when held, Enter when tapped
@@ -57,6 +57,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
              KY_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         KY_LALT, KY_LGUI, KY_NMPD, KC_SPC ,       SFT_ENT, KY_RNAV, KC_MPLY, KC_RALT
+        //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
+    ),
+
+    [_SWAP] = LAYOUT (
+        // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
+             KC_BSLS, KC_6   , KC_7   , KC_8   , KC_9   , KC_0   ,                         _______, _______, _______, _______, _______, _______,
+        // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
+             _______, KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   ,                         _______, _______, _______, _______, _______, _______,
+        // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
+             _______, KC_H   , KC_J   , KC_K   , KC_L   , KC_SCLN,                         _______, _______, _______, _______, _______, _______,
+        // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
+             _______, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
+        // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
+                                        _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -88,27 +102,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
-    [_SWAP] = LAYOUT (
-        // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_ESC , KC_0   , KC_9   , KC_8   , KC_7   , KC_6   ,                         _______, _______, _______, _______, _______, _______,
-        // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_P   , KC_O   , KC_I   , KC_U   , KC_Y   ,                         _______, _______, _______, _______, _______, _______,
-        // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_SCLN, KC_L   , KC_K   , KC_J   , KC_H   ,                         _______, _______, _______, _______, _______, _______,
-        // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_SLSH, KC_DOT , KC_COMM, KC_M   , KC_N   , KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
-        // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, _______, _______
-        //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
-    ),
-
     [_RNAV] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
              _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , WN_POWR,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , WN_CLSE,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , _______,
+             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , KC_APP ,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, XXXXXXX, KC_END , AP_MTJM, KC_RPRN,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
@@ -136,9 +136,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 uint16_t key_timer = 0;
 bool alt_tabbing = false;
 bool ctrl_tabbing = false;
-bool ctrl_pressed_after_numpad = false;  // Rolling key on KY_NMPD(down) -> KY_LCTL(down) -> KY_NMPD(up) -> KY_LCTL(up) = KC_DEL
 bool ctrl_pressed_before_numpad = false; // Rolling key on KY_LCTL(down) -> KY_NMPD(down) -> KY_LCTL(up) -> KY_NMPD(up) = C(KC_BSPC)
 bool shift_pressed_after_numpad = false; // Rolling key on KY_NMPD(down) -> KY_LSFT(down) -> KY_NMPD(up) -> KY_LSFT(up) = S(KC_9)
+bool shift_pressed_before_numpad = false; // Rolling key on KY_LSFT(down) -> KY_NMPD(down) -> KY_LSFT(up) -> KYNMPD(up) = KC_DEL
 bool other_key_pressed = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -167,25 +167,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KY_LCTL:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                ctrl_pressed_after_numpad = layer_state_is(_NUM) ? true : false;
                 key_timer = timer_read();
                 register_code(KC_LCTL);
             } else {
                 if (!other_key_pressed) {
                     if (mods & MOD_MASK_GUI) tap_code(KC_CAPS);
-                    else if (timer_elapsed(key_timer) < TAPPING_TERM) {
-                        if (ctrl_pressed_before_numpad) tap_code(KC_BSPC); // C(KC_BSPC)
-                        else if (layer_state_is(_NUM) | alt_tabbing) {
-                            del_mods(MOD_MASK_CTRL);
-                            tap_code(KC_DEL);
-                            set_mods(mods);
-                        }
-                    }
+                    else if ((timer_elapsed(key_timer) < TAPPING_TERM) && ctrl_pressed_before_numpad) tap_code(KC_BSPC); // C(KC_BSPC)
                 }
 
                 unregister_code(KC_LCTL);
                 ctrl_tabbing = false;
-                ctrl_pressed_before_numpad = false;
                 other_key_pressed = true;
             } break;
         case KY_LSFT:
@@ -195,8 +186,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
-                if (layer_state_is(_NUM) && !other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_9);
+                if (timer_elapsed(key_timer) < TAPPING_TERM) {
+                    if (shift_pressed_before_numpad) {
+                        del_mods(MOD_MASK_SHIFT);
+                        tap_code(KC_DEL);
+                        set_mods(mods);
+                    } else if (!other_key_pressed) {
+                        if (layer_state_is(_NUM)) tap_code(KC_9);
+                        else layer_invert(_SWAP);
+                    }
+                }
+
                 unregister_code(KC_LSFT);
+                shift_pressed_before_numpad = false;
                 other_key_pressed = true;
             } break;
         case KY_LALT:
@@ -234,32 +236,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record -> event.pressed) {
                 other_key_pressed = false;
                 if (mods & MOD_MASK_GUI) {
-                    tap_code16(C(KC_RGHT));
+                    tap_code16(C(KC_RGHT)); // G(C(KC_RGHT))
                     return false;
                 } else if (mods & MOD_MASK_CTRL) ctrl_pressed_before_numpad = true;
+                else if (mods & MOD_MASK_SHIFT) shift_pressed_before_numpad = true;
 
                 key_timer = timer_read();
-                if ((mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT)) > 0) layer_on(_SWAP);
-                else layer_on(_NUM);
+                layer_on(_NUM);
             } else {
                 layer_off(_NUM);
                 layer_off(_LNAV);
-                layer_off(_SWAP);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
-                        del_mods(MOD_MASK_CTRL);
-                        tap_code(KC_HOME);
-                        tap_code(KC_BSPC);
-                        set_mods(mods);
-                    } else if (ctrl_pressed_after_numpad) {
-                        del_mods(MOD_MASK_CTRL);
+                    if (shift_pressed_after_numpad) tap_code(KC_9);
+                    else if (mods & MOD_MASK_SHIFT) { // This to avoid pressed S(KC_LSFT)
+                        del_mods(MOD_MASK_SHIFT);
                         tap_code(KC_DEL);
                         set_mods(mods);
-                    } else if (shift_pressed_after_numpad) tap_code(KC_9);
-                    else tap_code(KC_BSPC);
+                    } else tap_code(KC_BSPC);
                 }
 
-                ctrl_pressed_after_numpad = false;
                 shift_pressed_after_numpad = false;
                 other_key_pressed = true;
             } break;
@@ -270,23 +265,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_on(_RNAV);
             } else {
                 layer_off(_RNAV);
-                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (mods & MOD_MASK_SHIFT && mods & MOD_MASK_CTRL) {
-                        del_mods(MOD_MASK_CTRL);
-                        tap_code(KC_END);
-                        tap_code(KC_DEL);
-                        set_mods(mods);
-                    } else tap_code(KC_DEL);
-                }
-
+                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_DEL);
                 other_key_pressed = true;
             } break;
         case WN_POWR:
             if (record -> event.pressed) {
                 other_key_pressed = true;
-                if (mods & MOD_MASK_ALT)                               tap_code(KC_SLEP);
-                else if (mods & MOD_MASK_ALT && mods & MOD_MASK_SHIFT) tap_code(KC_PWR);
-                else                                                   tap_code16(G(KC_L));
+                if (mods & MOD_MASK_ALT)                          tap_code(KC_SLEP);
+                else if (mods & (MOD_MASK_ALT || MOD_MASK_SHIFT)) tap_code(KC_PWR);
+                else                                              tap_code16(G(KC_L));
             } break;
         case MS_MCLK:
             if (record -> event.pressed) {
@@ -300,9 +287,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         default:
             other_key_pressed = true;
-            ctrl_pressed_after_numpad = false;
             ctrl_pressed_before_numpad = false;
             shift_pressed_after_numpad = false;
+            shift_pressed_before_numpad = false;
             break;
     }
 
@@ -422,9 +409,9 @@ void render_master(void) {
     else                                                      oled_write_P(separator[0], false);
 
     if (layer_state_is(_MOUSE))                              oled_write_P(layer_state[4], false);
-    else if (layer_state_is(_SWAP))                          oled_write_P(layer_state[5], false);
-    else if (layer_state_is(_LNAV) || layer_state_is(_RNAV)) oled_write_P(layer_state[3], false);
     else if (layer_state_is(_NUM))                           oled_write_P(layer_state[2], false);
+    else if (layer_state_is(_LNAV) || layer_state_is(_RNAV)) oled_write_P(layer_state[3], false);
+    else if (layer_state_is(_SWAP))                          oled_write_P(layer_state[5], false);
     else                                                     oled_write_P(layer_state[0], false);
 
     uint8_t mods = get_mods() | get_oneshot_mods();
