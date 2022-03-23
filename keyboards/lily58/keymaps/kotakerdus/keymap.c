@@ -136,6 +136,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 uint16_t key_timer = 0;
 bool alt_tabbing = false;
 bool ctrl_tabbing = false;
+bool ctrl_pressed_before_numpad = false; // Rolling key on KY_LCTL(down) -> KY_NMPD(down) -> KY_LCTL(up) -> KY_NMPD(up) = C(KC_BSPC)
 bool shift_pressed_after_numpad = false; // Rolling key on KY_NMPD(down) -> KY_LSFT(down) -> KY_NMPD(up) -> KY_LSFT(up) = S(KC_9)
 bool shift_pressed_before_numpad = false; // Rolling key on KY_LSFT(down) -> KY_NMPD(down) -> KY_LSFT(up) -> KYNMPD(up) = KC_DEL
 bool mods_pressed_in_swap = false;
@@ -173,11 +174,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 register_code(KC_LCTL);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (alt_tabbing) {
+                    if (ctrl_pressed_before_numpad) tap_code(KC_BSPC); // C(KC_BSPC) else if (mods & MOD_MASK_GUI) tap_code(KC_CAPS);
+                    else if (alt_tabbing) {
                         del_mods(MOD_MASK_CTRL);
                         tap_code(KC_DEL);
                         set_mods(mods);
-                    } else if (mods & MOD_MASK_GUI) tap_code(KC_CAPS);
+                    }
                     else if (!layer_state_is(_SWAP)) set_oneshot_layer(_SWAP, ONESHOT_START);
                     else {
                         reset_oneshot_layer();
@@ -190,6 +192,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
                 unregister_code(KC_LCTL);
                 ctrl_tabbing = false;
+                ctrl_pressed_before_numpad = false;
                 mods_pressed_in_swap = false;
                 other_key_pressed = true;
             } break;
@@ -275,7 +278,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record -> event.pressed) {
                 other_key_pressed = false;
                 if (layer_state_is(_SWAP)) mods_pressed_in_swap = true;
-                if (mods & MOD_MASK_SHIFT) shift_pressed_before_numpad = true;
+                if (mods & MOD_MASK_CTRL) ctrl_pressed_before_numpad = true;
+                else if (mods & MOD_MASK_SHIFT) shift_pressed_before_numpad = true;
                 else if (mods & MOD_MASK_GUI) {
                     tap_code16(C(KC_RGHT)); // G(C(KC_RGHT))
                     return false;
@@ -356,6 +360,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         default:
             if (layer_state_is(_SWAP) & !mods_pressed_in_swap) clear_oneshot_layer_state(ONESHOT_PRESSED);
+            ctrl_pressed_before_numpad = false;
             shift_pressed_after_numpad = false;
             shift_pressed_before_numpad = false;
             other_key_pressed = true;
