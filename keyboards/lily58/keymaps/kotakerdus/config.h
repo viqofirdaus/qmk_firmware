@@ -8,8 +8,9 @@
 
 #define AUTO_SHIFT_TIMEOUT 150
 
-#define MK_3_SPEED
-#define MK_MOMENTARY_ACCEL
+// Make sure using Liyang's mousekey.c and mousekey.h files
+#define MK_VARIANT MK_TYPE_KINETIC
+#define MK_KINETIC_WHEEL_MAXS 2
 
 #undef OLED_FONT_H
 #define OLED_FONT_H "keyboards/lily58/keymaps/kotakerdus/glcdfont_kotakerdus.c"

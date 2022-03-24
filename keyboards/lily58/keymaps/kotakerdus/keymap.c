@@ -23,12 +23,11 @@ enum custom_keycodes {
     MO_SHFT,              // KC_LSFT           | OSL(_SWAP) if tapped | KC_EQL  in _SWAP layer if tapped | S(KC_9) in _NUM layer if tapped
     MO_ALT ,              // KC_LALT           | OSL(_SWAP) if tapped | G(C(KC_LEFT)) if GUI-tapped
     LY_NMPD,              // LT(_NUM, KC_BSPC)                        | G(C(KC_RGHT)) if GUI-tapped
-    MS_MCLK               // KC_ACL1           | KC_BTN3 if tapped
+    MS_MCLK               // KC_ACL0           | KC_BTN3 if tapped
 };
 
 #define LY_LNAV LT(_LNAV, KC_DEL)
 #define LY_RNAV LT(_RNAV, KC_DEL)
-#define LY_MOUS LT(_MOUSE, KC_MPLY)
 
 #define SFT_ENT KC_SFTENT    // Space Cadet - Right Shift when held, Enter when tapped
 #define AP_SNIP KC_F13       // Snipaste shortcut to take a screenshot
@@ -48,7 +47,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              MO_SHFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        MO_ALT , KC_LGUI, LY_NMPD, KC_SPC ,       SFT_ENT, LY_RNAV, LY_MOUS, KC_RALT
+                                        MO_ALT , KC_LGUI, LY_NMPD, KC_SPC ,       SFT_ENT, LY_RNAV, KC_MPLY, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -104,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, XXXXXXX, KC_END , XXXXXXX, KC_RPRN,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, KC_APP , _______
+                                        _______, _______, _______, _______,       _______, _______, KC_MPRV, KC_MNXT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -118,7 +117,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______, _______,       _______, _______, KC_BTN4, KC_WH_D, KC_BTN5, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, KC_MPRV, _______, KC_MNXT
+                                        _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     )
 };
@@ -250,9 +249,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record -> event.pressed) {
                 other_key_pressed = false;
                 key_timer = timer_read();
-                register_code(KC_ACL1);
+                register_code(KC_ACL0);
             } else {
-                unregister_code(KC_ACL1);
+                unregister_code(KC_ACL0);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_BTN3);
                 other_key_pressed = true;
             } break;
@@ -265,7 +264,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
     return true;
-};
+}
 
 // Custom Auto Shift - https://docs.qmk.fm/#/feature_auto_shift
 bool get_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
@@ -317,6 +316,10 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
     }
 }
 
+layer_state_t layer_state_set_user(layer_state_t state) {
+  return update_tri_layer_state(state, _NUM, _RNAV, _MOUSE);
+}
+
 // O L E D   I N T E R F A C E |----------------------------------------------------------------------------------------------------------------
 
 #ifdef OLED_ENABLE
@@ -342,7 +345,7 @@ void render_tawheed(void) {
     };
 
     oled_write_raw_P(tawheed, sizeof(tawheed));
-};
+}
 
 void render_master(void) {
     static const char PROGMEM lily58[] = {
@@ -400,20 +403,20 @@ void render_master(void) {
     oled_write_P(mods & MOD_MASK_CTRL  ? mod_ctrl[0]  : PSTR("  "), false);
     oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift[1] : PSTR("  "), false); oled_write(" ", false);
     oled_write_P(mods & MOD_MASK_CTRL  ? mod_ctrl[1]  : PSTR("  "), false);
-};
+}
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return is_keyboard_master() ? OLED_ROTATION_270 : OLED_ROTATION_180;
-};
+}
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) render_master();
     else                      render_tawheed();
     return false;
-};
+}
 
 void suspend_power_down_user(void) {
     oled_off();
-};
+}
 
 #endif // OLED_ENABLE
