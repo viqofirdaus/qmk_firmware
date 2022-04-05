@@ -100,7 +100,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
              _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , AP_CLOS,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , _______,
+             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , KC_ASTG,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
@@ -128,7 +128,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // C U S T O M   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 uint16_t key_timer = 0;
- // Helper for quick rolling key on (MD_LCTL / MD_LSFT) + LT_NUMP
+// Helper for quick rolling key on (MD_LCTL / MD_LSFT) + LT_NUMP
 bool mod_before_numpad = false; // (ie: MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up) -> LT_NUMP(up) = C(KC_BSPC) instead of (KC_BSPC))
 bool mod_after_numpad = false;  // (ie: LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up) -> MD_LSFT(up) = S(KC_9) instead of S(KC_BSPC))
 // This block un-intended trigger on custom key while rolling-key on common shortcut (ie: CTRL + Z)
@@ -174,8 +174,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 register_code(KC_LSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (mod_before_numpad) tap_code(KC_BSPC);
-                    else if (layer_state_is(_NUM)) tap_code(KC_9);
+                    if (layer_state_is(_NUM)) tap_code(KC_9);
                     else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_MASK_SHIFT);
                         tap_code(KC_EQL);
@@ -274,6 +273,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MS_SPED:
             if (record -> event.pressed) {
                 other_key_pressed = false;
+                key_timer = timer_read();
                 register_code(KC_ACL0);
             } else {
                 unregister_code(KC_ACL0);
