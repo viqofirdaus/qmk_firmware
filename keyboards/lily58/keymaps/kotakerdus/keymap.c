@@ -90,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, KC_HOME, KC_MPLY, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
+             _______, KC_ASTG, KC_HOME, KC_MPLY, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, KC_LGUI, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -100,7 +100,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
              _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , AP_CLOS,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , KC_ASTG,
+             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
@@ -128,13 +128,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // C U S T O M   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 uint16_t key_timer = 0;
-// Helper for quick rolling key on (MD_LCTL / MD_LSFT) + LT_NUMP
+// Boolean for checking on quick rolling key on (MD_LCTL / MD_LSFT) + LT_NUMP
 bool mod_before_numpad = false; // (ie: MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up) -> LT_NUMP(up) = C(KC_BSPC) instead of (KC_BSPC))
 bool mod_after_numpad = false;  // (ie: LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up) -> MD_LSFT(up) = S(KC_9) instead of S(KC_BSPC))
 // This block un-intended trigger on custom key while rolling-key on common shortcut (ie: CTRL + Z)
 bool other_key_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    uint8_t mods = get_mods();
+    const uint8_t mods = get_mods();
     switch (keycode) {
         case KC_GRV:
             if (record -> event.pressed) {
@@ -160,7 +160,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         tap_code(KC_QUOT);
                         if (!(mods & ~MOD_MASK_CTRL)) layer_off(_SWAP); // Turn layer _SWAP off if only CTRL mod key is pressed
                     }
-                } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release the this button
+                } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
                 unregister_code(KC_LCTL);
                 mod_before_numpad = false;
@@ -416,7 +416,7 @@ void render_master(void) {
     else if (layer_state_is(_SWAP))                          oled_write_P(layer_state[1], false);
     else                                                     oled_write_P(layer_state[0], false);
 
-    uint8_t mods = get_mods();
+    const uint8_t mods = get_mods();
     oled_write_P(mods & MOD_MASK_GUI   ? mod_gui[0]   : mod_blank, false); oled_advance_char();
     oled_write_P(mods & MOD_MASK_ALT   ? mod_alt[0]   : mod_blank, false);
     oled_write_P(mods & MOD_MASK_GUI   ? mod_gui[1]   : mod_blank, false); oled_advance_char();
@@ -431,13 +431,13 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return is_keyboard_master() ? OLED_ROTATION_270 : OLED_ROTATION_90;
 }
 
-bool oled_task_user(void) {
+bool oled_task_user() {
     if (is_keyboard_master()) render_master();
     else                      render_tawheed();
     return false;
 }
 
-void suspend_power_down_user(void) {
+void suspend_power_down_user() {
     oled_off();
 }
 
