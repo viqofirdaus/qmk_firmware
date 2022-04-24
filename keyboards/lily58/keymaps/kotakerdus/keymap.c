@@ -1,11 +1,14 @@
 /*
 * Author      : kotakerdus
-* Version     : 0.2.1
+* Version     : 0.2.3
 * OS          : Windows 10
+* Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
+*               - Snipaste (screenshot app that is able to pin the screenshot on desktop)
+*               - ViRb3 SylphyHornEx (windows's task view management app, ie: move window to right desktop view)
 * Keyboard    : lily58
-* Description : Custom lily58 keyboard focusing on left hand layout + mouse, useful for design application like Blender, Photoshop and many
-*               other design application. This layout has _SWAP layer that work like QMK's OSL which useful for trigger a shortcut without
-*               having to reach the other half of the keyboard.
+* Description : Custom lily58 keyboard focusing on left hand layout + mouse, useful for work that demands on mouse usage a lot like Blender,
+*               Photoshop and many other design application. This layout has _SWAP layer that work like QMK's OSL which useful for trigger
+*               a shortcut without having to reach the other half of the keyboard.
 */
 
 #include QMK_KEYBOARD_H
@@ -17,21 +20,23 @@ enum layer_number {
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 enum custom_keycodes {
-    MD_LCTL = SAFE_RANGE, // KC_LCTL           | Toggle _SWAP if tapped (OSL-like)                     | KC_QUOT in _SWAP & turn it off
-    MD_LSFT,              // SFT_T(KC_CAPS)    | SFT_T(KC_LPRN) in _NUM or _RNAV (open parentheses)    | KC_EQL  in _SWAP & turn it off
-    MD_RSFT,              // RSFT_T(KC_EQL)    | RSFT_T(KC_RPRN) in _NUM or _RNAV (close parentheses)
-    MD_LALT,              // KC_LALT           | G(C(KC_LEFT)) if LGUI-tapped (slide to left desktop)  | Turn off _SWAP if tapped
-    MD_LGUI,              // KC_LGUI                                                                   | Turn off _SWAP if tapped
-    LT_NUMP,              // LT(_NUM, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped (slide to right desktop) | KC_DEL if SHIFT-tapped
+    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) - holding mod keys won't end OSL  | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP off
+    MD_LSFT,              // SFT_T(KC_CAPS)    | LSFT_T(KC_LPRN) in _NUM or _RNAV | LSFT_T(KC_EQL)  in _SWAP & toggle _SWAP off
+    MD_RSFT,              // RSFT_T(KC_EQL)    | RSFT_T(KC_RPRN) in _NUM or _RNAV                            & toggle _SWAP off
+    MD_LALT,              // KC_LALT           | G(C(KC_LEFT)) if LGUI-tapped (slide to left desktop view)   & toggle _SWAP off
+    MD_LGUI,              // KC_LGUI                                                                         & toggle _SWAP off
+    LT_NUMP,              // LT(_NUM, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped | KC_DEL if SHIFT-tapped       & toggle _SWAP off
+    LT_LNAV,              // LT(_LNAV, KC_F13) - KC_F13 for Snipaste shortcut for taking a screenshot
     LT_RNAV,              // LT(_RNAV, KC_DEL)
-    LT_LNAV,              // LT(_LNAV, KC_DEL)
     MS_SPED               // KC_ACL0           | KC_BTN3 if tapped
 };
 
+// KC_GRV | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | (S(KC_TAB)) if alt/ctrl tabbing
 #define BR_PREV C(S(KC_TAB)) // Browser shortcut
 #define BR_NEXT C(KC_TAB)
-#define WN_CLOS A(KC_F4)     // Close window shortcut
-#define SP_SNIP KC_F13       // Snipaste shortcut to take a screenshot
+#define WN_CLSE A(KC_F4) // Window shortcut
+#define WN_MAXI G(KC_UP)
+#define WN_MINI G(KC_DOWN)
 
 // K E Y M A P S |------------------------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +52,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              MD_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, MD_RSFT,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        MD_LALT, MD_LGUI, LT_NUMP, KC_SPC ,       KC_ENT , LT_RNAV, KC_RGUI, KC_RALT
+                                        MD_LALT, MD_LGUI, LT_NUMP, KC_SPC ,       KC_ENT , LT_RNAV, KC_MPLY, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -69,7 +74,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
              KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             SP_SNIP, KC_PMNS, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
+             _______, KC_PMNS, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, LT_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PDOT,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
@@ -87,7 +92,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, KC_HOME, KC_MPLY, KC_END , _______, _______,       _______, _______, _______, _______, _______, _______, _______,
+             _______, XXXXXXX, KC_HOME, KC_MPLY, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -95,11 +100,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_RNAV] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , WN_CLOS,
+             _______, _______, _______, _______, _______, _______,                         KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , WN_CLSE,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , XXXXXXX,
+             _______, _______, _______, _______, _______, _______,                         KC_VOLU, KC_PGUP, KC_UP  , KC_PGDN, KC_F11 , WN_MAXI,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , XXXXXXX,
+             _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , WN_MINI,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, KC_APP , KC_END , XXXXXXX, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
@@ -109,13 +114,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUSE] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, KC_SLEP,
+             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         XXXXXXX, BR_PREV, KC_WH_U, BR_NEXT, _______, XXXXXXX,
+             _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         _______, BR_PREV, KC_WH_U, BR_NEXT, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         XXXXXXX, KC_BTN1, MS_SPED, KC_BTN2, _______, XXXXXXX,
+             _______, _______, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         _______, KC_BTN1, MS_SPED, KC_BTN2, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┐     ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, KC_BTN4, XXXXXXX, KC_BTN5, _______, XXXXXXX,       XXXXXXX, XXXXXXX, KC_WH_L, KC_WH_D, KC_WH_R, XXXXXXX, _______,
+             _______, XXXXXXX, KC_BTN4, KC_MPLY, KC_BTN5, KC_ENT , _______,       _______, _______, KC_WH_L, KC_WH_D, KC_WH_R, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -125,57 +130,71 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // C U S T O M   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 uint16_t key_timer = 0;
-// Boolean for checking on quick rolling key on (MD_LCTL / MD_LSFT / MD_RSFT) + (LT_NUMP / LT_RNAV)
+// Easy alt/ctrl tabbing by pressing KC_GRV for S(KC_TAB) instead of holding SHIFT key for selecting previous tab/window
+bool tabbing = false;
+// Boolean for checking on quick rolling-key on (MD_LCTL / MD_LSFT / MD_RSFT) + (LT_NUMP / LT_RNAV)
 bool mod_before_layer = false; // (ie: MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up) -> LT_NUMP(up) = C(KC_BSPC) instead of (KC_BSPC))
 bool mod_after_layer = false;  // (ie: LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up) -> MD_LSFT(up) = S(KC_9) instead of S(KC_BSPC))
-// This block un-intended trigger on custom key while rolling-key on common shortcut (ie: CTRL + Z)
+// This block un-intended trigger on custom key while quick rolling-key on common shortcut (ie: CTRL + Z would not trigger OSL(_SWAP))
 bool other_key_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods = get_mods();
     switch (keycode) {
+        case KC_TAB:
+            if (record -> event.pressed && (mods & (MOD_BIT(KC_LALT) | MOD_MASK_CTRL))) tabbing = true;
+            break;
         case KC_GRV:
             if (record -> event.pressed) {
-                if (mods & MOD_BIT(KC_LGUI)) {
+                if (tabbing) {
+                    tap_code16(S(KC_TAB));
+                    return false;
+                } else if (mods & MOD_BIT(KC_LGUI)) {
                     other_key_pressed = true;
-                    tap_code16(S(KC_RGHT)); // G(S(KC_RGHT)) - Move current active window to next monitor
+                    tap_code16(S(KC_RGHT));
                     return false;
                 }
             } break;
         case MD_LCTL:
             if (record -> event.pressed) {
-                other_key_pressed = false;
+                other_key_pressed = (mods > 1) ? true : false;
                 if (layer_state_is(_NUM)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LCTL);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
+                    // NOTE: This mod_before_layer is the one that make the quick-rolling work on mod-key release
                     if (mod_before_layer) tap_code(KC_BSPC); // C(KC_BSPC)
                     else if (layer_state_is(_QWERTY)) layer_on(_SWAP);
                     else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_MASK_CTRL);
                         tap_code(KC_QUOT);
-                        if (!(mods & ~MOD_MASK_CTRL)) layer_off(_SWAP); // Turn layer _SWAP off if only CTRL mod key is pressed
+                        if (!(mods & ~(MOD_BIT(KC_LCTL)))) layer_off(_SWAP); // Turn layer _SWAP off if only left CTRL mod key is pressed
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
                 unregister_code(KC_LCTL);
+                tabbing = false;
                 mod_before_layer = false;
                 other_key_pressed = true;
             } break;
         case MD_LSFT:
             if (record -> event.pressed) {
-                other_key_pressed = false;
+                other_key_pressed = (mods > 1) ? true : false;
                 if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if ((layer_state_is(_NUM) || layer_state_is(_RNAV)) && mod_after_layer) tap_code(KC_9); // S(KC_9) - Open parenthesis
-                    else if (layer_state_is(_SWAP)) {
+                    if (mod_before_layer) {
                         del_mods(MOD_MASK_SHIFT);
+                        tap_code(KC_DEL);
+                    } else if ((layer_state_is(_NUM) || layer_state_is(_RNAV)) && mod_after_layer) tap_code(KC_9); // S(KC_9) - Open parenthesis
+                    else if (layer_state_is(_QWERTY)) tap_code(KC_CAPS);
+                    else if (layer_state_is(_SWAP)) {
+                        del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
-                        if (!(mods & ~MOD_MASK_SHIFT)) layer_off(_SWAP);
-                    } else if (layer_state_is(_QWERTY)) tap_code(KC_CAPS);
+                        if (!(mods & ~(MOD_BIT(KC_LSFT)))) layer_off(_SWAP);
+                    }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
                 unregister_code(KC_LSFT);
@@ -184,24 +203,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_RSFT:
             if (record -> event.pressed) {
+                other_key_pressed = (mods > 1) ? true : false;
                 if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
                 else if (layer_state_is(_QWERTY) && (mods & MOD_MASK_SHIFT)) {
-                    other_key_pressed = true;
                     tap_code(KC_EQL); // Trigger SHIFT-ed KC_EQL
                     return false;
                 }
 
-                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_RSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     if ((layer_state_is(_NUM) || layer_state_is(_RNAV)) && mod_after_layer) tap_code(KC_0); // S(KC_0) - Close parenthesis
-                    else if (layer_state_is(_QWERTY)) {
-                        del_mods(MOD_MASK_SHIFT);
+                    else if (layer_state_is(_QWERTY) || layer_state_is(_SWAP)) {
+                        del_mods(MOD_BIT(KC_RSFT));
                         tap_code(KC_EQL);
+                        if (layer_state_is(_SWAP))
+                            if (!(mods & ~(MOD_BIT(KC_RSFT)))) layer_off(_SWAP);
                     }
-                }
+                } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
                 unregister_code(KC_RSFT);
                 mod_before_layer = false;
@@ -209,13 +229,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_LALT:
             if (record -> event.pressed) {
+                other_key_pressed = (mods > 1) ? true : false;
                 if (mods & MOD_BIT(KC_LGUI)) {
-                    other_key_pressed = true;
-                    tap_code16(C(KC_LEFT));
+                    if (layer_state_is(_NUM)) tap_code16(A(C(KC_LEFT))); // SylphyHorn shortcut to move both window and desktop to the left
+                    else tap_code16(C(KC_LEFT));
                     return false;
                 }
 
-                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_LALT);
             } else {
@@ -223,11 +243,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     if (layer_state_is(_SWAP) && (!(mods & ~MOD_MASK_ALT))) layer_off(_SWAP);
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
+                tabbing = false;
                 other_key_pressed = true;
             } break;
         case MD_LGUI:
             if (record -> event.pressed) {
-                other_key_pressed = false;
+                other_key_pressed = (mods > 1) ? true : false;
                 key_timer = timer_read();
                 register_code(KC_LGUI);
             } else {
@@ -239,14 +260,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case LT_NUMP:
             if (record -> event.pressed) {
-                layer_off(_SWAP);
+                other_key_pressed = false;
                 if (mods & MOD_BIT(KC_LGUI)) {
                     other_key_pressed = true;
                     tap_code16(C(KC_RGHT));
                     return false;
                 }
 
-                other_key_pressed = false;
+                // NOTE: Make sure to add MOD_MASK for related mod key you want to add quick-rolling behaviour to work
                 if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
                 layer_on(_NUM);
@@ -257,9 +278,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     if (mod_after_layer) {
                         if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9);      // S(KC_9) - Open parenthesis
                         else if (mods & MOD_BIT(KC_RSFT)) tap_code(KC_0); // S(KC_0) - Close parenthesis
-                    } else tap_code(KC_BSPC);
+                    } else if (mods & MOD_BIT(KC_LSFT)) {
+                        del_mods(MOD_MASK_SHIFT);
+                        tap_code(KC_DEL);
+                    } else if (!layer_state_is(_SWAP)) tap_code(KC_BSPC);
                 }
 
+                layer_off(_SWAP);
                 mod_after_layer = false;
                 other_key_pressed = true;
             } break;
@@ -288,7 +313,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_on(_LNAV);
             } else {
                 layer_off(_LNAV);
-                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_DEL);
+                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_F13);
                 other_key_pressed = true;
             } break;
         case MS_SPED:
