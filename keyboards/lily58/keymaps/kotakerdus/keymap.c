@@ -1,6 +1,6 @@
 /*
 * Author      : kotakerdus
-* Version     : 0.2.4
+* Version     : 0.2.5
 * OS          : Windows 10
 * Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
 *               - Snipaste (screenshot app that is able to pin the screenshot on screen)
@@ -20,20 +20,20 @@ enum layer_number {
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 enum custom_keycodes {
-    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) - holding mod keys won't end OSL  | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP off
-    MD_LSFT,              // SFT_T(KC_CAPS)    | LSFT_T(KC_LPRN) in _NUM or _RNAV | LSFT_T(KC_EQL)  in _SWAP & toggle _SWAP off
+    MD_LCTL = SAFE_RANGE, // LCTL_T(KC_CAPS)                                      | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP off
+    MD_LSFT,              // SFT_T(OSL(_SWAP)) | LSFT_T(KC_LPRN) in _NUM or _RNAV | LSFT_T(KC_EQL) in _SWAP  & toggle _SWAP off
     MD_RSFT,              // RSFT_T(KC_EQL)    | RSFT_T(KC_RPRN) in _NUM or _RNAV                            | toggle _SWAP off
-    MD_LALT,              // KC_LALT           | G(C(KC_LEFT)) if LGUI-tapped (slide to left desktop view)   | toggle _SWAP off
-    MD_LGUI,              // KC_LGUI & can combo-ed with MD_LALT and LT_NUMP for desktop management shortcut | toggle _SWAP off
+    MD_LALT,              // KC_LALT           | G(C(KC_LEFT)) if LGUI-tapped                                | toggle _SWAP off
+    MD_LGUI,              // KC_LGUI                                                                         | toggle _SWAP off
     LT_NUMP,              // LT(_NUM, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped                                | toggle _SWAP off
     LT_LNAV,              // LT(_LNAV, KC_DEL)
     LT_RNAV,              // LT(_RNAV, KC_DEL)
-    WN_CLSE,              // A(KC_F4)          | KC_SLEP if SHIFT-tapped | KC_PWR if GUI-tapped
     MS_SPED               // KC_ACL0           | KC_BTN3 if tapped
 };
 
 // KC_GRV | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | (S(KC_TAB)) if alt/ctrl tabbing
 #define SP_SNIP KC_F13
+#define WN_CLSE A(KC_F4)
 #define WN_MAXI G(KC_UP)
 #define WN_MINI G(KC_DOWN)
 
@@ -113,7 +113,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUSE] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, _______,
+             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, KC_SLEP,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         _______, _______, KC_WH_U, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -134,7 +134,7 @@ bool tabbing = false;
 // Boolean for checking on quick rolling-key on MD_* keys combo with LT_* keys
 bool mod_before_layer = false; // (ie: MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up) -> LT_NUMP(up) = C(KC_BSPC) instead of (KC_BSPC))
 bool mod_after_layer = false;  // (ie: LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up) -> MD_LSFT(up) = S(KC_9) instead of S(KC_BSPC))
-// This block un-intended trigger on custom key while quick rolling-key on common shortcut (ie: CTRL + Z would not trigger OSL(_SWAP))
+// This block un-intended trigger on custom key while quick rolling-key on common shortcut (ie: CTRL + Z would not trigger KC_CAPS
 bool other_key_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods = get_mods();
@@ -148,25 +148,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     tap_code16(S(KC_TAB));
                     return false;
                 } else if (mods & MOD_BIT(KC_LGUI)) {
-                    other_key_pressed = true;
                     tap_code16(S(KC_RGHT));
                     return false;
                 }
             } break;
         case MD_LCTL:
             if (record -> event.pressed) {
-                other_key_pressed = (mods > 1) ? true : false;
+                other_key_pressed = false;
+                if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LCTL);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // NOTE: mod_before_layer is for triggering C(KC_BSPC) on quick-rolling MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up)
-                    if (mod_before_layer) tap_code(KC_BSPC); // C(KC_BSPC)
-                    else if (layer_state_is(_QWERTY)) layer_on(_SWAP);
+                    // mod_before_layer is for triggering C(KC_BSPC) on quick-rolling MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up)
+                    if (mod_before_layer) {
+                        if (layer_state_is(_NUM)) tap_code(KC_BSPC);
+                        else if (layer_state_is(_RNAV)) tap_code(KC_DEL);
+                    } else if (layer_state_is(_QWERTY) && (mods == MOD_BIT(KC_LCTL))) tap_code(KC_CAPS); // Toggle if no other mod is pressed
                     else if (layer_state_is(_SWAP)) {
-                        del_mods(MOD_MASK_CTRL);
+                        del_mods(MOD_BIT(KC_LCTL));
                         tap_code(KC_QUOT);
-                        if (!(mods & ~(MOD_BIT(KC_LCTL)))) layer_off(_SWAP); // Turn layer _SWAP off if only left CTRL mod key is pressed
+                        if (mods == MOD_BIT(KC_LCTL)) layer_off(_SWAP); // Turn layer _SWAP off if only left CTRL mod key is pressed
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
@@ -177,19 +179,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_LSFT:
             if (record -> event.pressed) {
-                other_key_pressed = (mods > 1) ? true : false;
-                // NOTE: mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up)
+                other_key_pressed = false;
+                // mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up)
                 if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     if ((layer_state_is(_NUM) || layer_state_is(_RNAV)) && mod_after_layer) tap_code(KC_9); // S(KC_9) - Open parenthesis
-                    else if (layer_state_is(_QWERTY)) tap_code(KC_CAPS);
+                    else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
                     else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
-                        if (!(mods & ~(MOD_BIT(KC_LSFT)))) layer_off(_SWAP);
+                        if (mods == MOD_BIT(KC_LSFT)) layer_off(_SWAP);
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
@@ -198,9 +200,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_RSFT:
             if (record -> event.pressed) {
-                other_key_pressed = (mods > 1) ? true : false;
+                other_key_pressed = false;
                 if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
-                else if (layer_state_is(_QWERTY) && (mods & MOD_MASK_SHIFT)) {
+                else if (layer_state_is(_QWERTY) && (mods & MOD_BIT(KC_LSFT))) {
                     tap_code(KC_EQL); // Trigger SHIFT-ed KC_EQL
                     return false;
                 }
@@ -214,7 +216,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         del_mods(MOD_BIT(KC_RSFT));
                         tap_code(KC_EQL);
                         if (layer_state_is(_SWAP))
-                            if (!(mods & ~(MOD_BIT(KC_RSFT)))) layer_off(_SWAP);
+                            if (mods == MOD_BIT(KC_RSFT)) layer_off(_SWAP);
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
@@ -223,7 +225,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_LALT:
             if (record -> event.pressed) {
-                other_key_pressed = (mods > 1) ? true : false;
+                other_key_pressed = false;
                 if (mods & MOD_BIT(KC_LGUI)) {
                     if (layer_state_is(_NUM)) tap_code16(A(C(KC_LEFT))); // SylphyHorn shortcut to move both window and desktop to the left
                     else tap_code16(C(KC_LEFT));
@@ -235,20 +237,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 unregister_code(KC_LALT);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (layer_state_is(_SWAP) && (!(mods & ~MOD_MASK_ALT))) layer_off(_SWAP);
+                    if (layer_state_is(_SWAP) && (mods == MOD_BIT(KC_LALT))) layer_off(_SWAP);
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
                 tabbing = false;
                 other_key_pressed = true;
             } break;
         case MD_LGUI:
             if (record -> event.pressed) {
-                other_key_pressed = (mods > 1) ? true : false;
+                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_LGUI);
             } else {
                 unregister_code(KC_LGUI);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (layer_state_is(_SWAP) && (!(mods & ~MOD_MASK_GUI))) layer_off(_SWAP);
+                    if (layer_state_is(_SWAP) && (mods == MOD_BIT(KC_LGUI))) layer_off(_SWAP);
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
                 other_key_pressed = true;
             } break;
@@ -261,7 +263,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     return false;
                 }
 
-                // NOTE: Make sure to add MOD_MASK for related mod key you want to add quick-rolling behaviour to work
+                // Make sure to add MOD_MASK for related mod key you want to add quick-rolling behaviour to work
                 if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
                 layer_on(_NUM);
@@ -269,7 +271,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_NUM);
                 layer_off(_LNAV);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // NOTE: mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up)
+                    // mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up)
                     if (mod_after_layer) {
                         if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9);      // S(KC_9) - Open parenthesis
                         else if (mods & MOD_BIT(KC_RSFT)) tap_code(KC_0); // S(KC_0) - Close parenthesis
@@ -283,14 +285,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LT_RNAV:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                // NOTE: Make sure to add MOD_MASK for related mod key you want to add quick-rolling behaviour to work
+                // Make sure to add MOD_MASK for related mod key you want to add quick-rolling behaviour to work
                 if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
                 layer_on(_RNAV);
             } else {
                 layer_off(_RNAV);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // NOTE: mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up)
+                    // mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(down) -> MD_LSFT(down) -> LT_NUMP(up)
                     if (mod_after_layer) {
                         if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9);      // S(KC_9) - Open parenthesis
                         else if (mods & MOD_BIT(KC_RSFT)) tap_code(KC_0); // S(KC_0) - Close parenthesis
@@ -310,13 +312,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_DEL);
                 other_key_pressed = true;
             } break;
-        case WN_CLSE:
-            if (record -> event.pressed) {
-                other_key_pressed = true;
-                if (mods & MOD_MASK_SHIFT) tap_code(KC_SLEP);
-                else if (mods & MOD_MASK_GUI) tap_code(KC_PWR);
-                else tap_code16(A(KC_F4));
-            } return false;
         case MS_SPED:
             if (record -> event.pressed) {
                 other_key_pressed = false;
@@ -329,7 +324,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         default:
             if (record -> event.pressed) other_key_pressed = true;
-            else if (layer_state_is(_SWAP) && (!(mods & MOD_MASK_CSAG)))
+            else if (layer_state_is(_SWAP) && mods == 0)
                 layer_off(_SWAP); // Turn layer _SWAP off if default keys are pressed while not holding any mod key
             break;
     }
@@ -364,6 +359,7 @@ bool get_custom_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
     switch(keycode) {
         case KC_PMNS ... KC_PENT: // KC_PMNS, KC_PPLS, KC_PENT
         case KC_PDOT:
+        case KC_SLEP:
             return true;
         default:
             return false;
@@ -376,6 +372,7 @@ void autoshift_press_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
         case KC_PPLS: register_code16((!shifted) ? KC_PPLS : KC_PAST); break;
         case KC_PENT: register_code16((!shifted) ? KC_PENT : KC_EQL);  break;
         case KC_PDOT: register_code16((!shifted) ? KC_PDOT : KC_COMM); break;
+        case KC_SLEP: register_code16((!shifted) ? KC_SLEP : KC_PWR);  break;
         default:
             if (shifted) add_weak_mods(MOD_BIT(KC_LSFT));
             register_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
@@ -388,6 +385,7 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
         case KC_PPLS: unregister_code16((!shifted) ? KC_PPLS : KC_PAST); break;
         case KC_PENT: unregister_code16((!shifted) ? KC_PENT : KC_EQL);  break;
         case KC_PDOT: unregister_code16((!shifted) ? KC_PDOT : KC_COMM); break;
+        case KC_SLEP: unregister_code16((!shifted) ? KC_SLEP : KC_PWR);  break;
         default: unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
     }
 }
