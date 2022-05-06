@@ -1,6 +1,6 @@
 /*
 * Author      : kotakerdus
-* Version     : 0.2.5
+* Version     : 0.2.6
 * OS          : Windows 10
 * Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
 *               - Snipaste (screenshot app that is able to pin the screenshot on screen)
@@ -9,6 +9,8 @@
 * Description : Custom lily58 keyboard focusing on left hand layout + mouse, useful for work that demands on mouse usage like Blender,
 *               Photoshop and many other design application. This layout has _SWAP layer that work like QMK's OSL which useful for trigger
 *               a shortcut without having to reach the other half of the keyboard.
+*               The OSL in this keymap won't end if you press the alpha-key while holding a mod-key so it is useful if you want to trigger
+*               the shortcut more than once and goes back to default layer as soon as you release the mod-key (ie: CTRL + Y for redo).
 */
 
 #include QMK_KEYBOARD_H
@@ -31,7 +33,7 @@ enum custom_keycodes {
     MS_SPED               // KC_ACL0           | KC_BTN3 if tapped
 };
 
-// KC_GRV | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | (S(KC_TAB)) if alt/ctrl tabbing
+// KC_ESC | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | S(KC_TAB) if alt/ctrl tabbing
 #define SP_SNIP KC_F13
 #define WN_CLSE A(KC_F4)
 #define WN_MAXI G(KC_UP)
@@ -43,7 +45,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_QWERTY] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_GRV , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   ,                         KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_BSLS,
+             KC_ESC , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   ,                         KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_BSLS,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   ,                         KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_MINS,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -71,7 +73,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_NUM] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  ,                         _______, _______, _______, _______, _______, _______,
+             KC_GRV , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              SP_SNIP, KC_PMNS, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -113,7 +115,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUSE] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┐                       ┌────────┬────────┬────────┬────────┬────────┬────────┐
-             _______, _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, KC_SLEP,
+             KC_ESC , _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, KC_SLEP,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         _______, _______, KC_WH_U, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤                       ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -129,7 +131,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // C U S T O M   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 uint16_t key_timer = 0;
-// Easy alt/ctrl tabbing by pressing KC_GRV for S(KC_TAB) instead of holding SHIFT key for selecting previous tab/window
+// Easy SHIFT + alt/ctrl-tabbing by pressing KC_ESC for S(KC_TAB) instead of holding SHIFT key for selecting previous tab/window
 bool tabbing = false;
 // Boolean for checking on quick rolling-key on MD_* keys combo with LT_* keys
 bool mod_before_layer = false; // (ie: MD_LCTL(down) -> LT_NUMP(down) -> MD_LCTL(up) -> LT_NUMP(up) = C(KC_BSPC) instead of (KC_BSPC))
@@ -142,13 +144,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_TAB:
             if (record -> event.pressed && (mods & (MOD_BIT(KC_LALT) | MOD_MASK_CTRL))) tabbing = true;
             break;
-        case KC_GRV:
+        case KC_ESC:
             if (record -> event.pressed) {
                 if (tabbing) {
                     tap_code16(S(KC_TAB));
                     return false;
+                } else if (mods & MOD_MASK_ALT) {
+                    tap_code(KC_F4); // Trigger A(KC_F4)
+                    return false;
                 } else if (mods & MOD_BIT(KC_LGUI)) {
-                    tap_code16(S(KC_RGHT));
+                    tap_code16(S(KC_RGHT)); // Trigger G(S(KC_RGHT))
                     return false;
                 }
             } break;
@@ -342,14 +347,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 bool get_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_1 ... KC_0:
-        case KC_MINUS ... KC_QUOTE:
-        case KC_COMMA ... KC_SLASH:
+        case KC_MINUS ... KC_SLASH:
         case KC_NONUS_BACKSLASH:
-            return true;
+            return true; // Only enable Auto Shift on these keys
         case KC_A ... KC_Z:
         case KC_TAB:
-        case KC_GRV:
-            return false; // Disable Auto Shift on these keys
+            return false;
     }
 
     return get_custom_auto_shifted_key(keycode, record);
@@ -359,7 +362,6 @@ bool get_custom_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
     switch(keycode) {
         case KC_PMNS ... KC_PENT: // KC_PMNS, KC_PPLS, KC_PENT
         case KC_PDOT:
-        case KC_SLEP:
             return true;
         default:
             return false;
@@ -372,7 +374,6 @@ void autoshift_press_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
         case KC_PPLS: register_code16((!shifted) ? KC_PPLS : KC_PAST); break;
         case KC_PENT: register_code16((!shifted) ? KC_PENT : KC_EQL);  break;
         case KC_PDOT: register_code16((!shifted) ? KC_PDOT : KC_COMM); break;
-        case KC_SLEP: register_code16((!shifted) ? KC_SLEP : KC_PWR);  break;
         default:
             if (shifted) add_weak_mods(MOD_BIT(KC_LSFT));
             register_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
@@ -385,7 +386,6 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
         case KC_PPLS: unregister_code16((!shifted) ? KC_PPLS : KC_PAST); break;
         case KC_PENT: unregister_code16((!shifted) ? KC_PENT : KC_EQL);  break;
         case KC_PDOT: unregister_code16((!shifted) ? KC_PDOT : KC_COMM); break;
-        case KC_SLEP: unregister_code16((!shifted) ? KC_SLEP : KC_PWR);  break;
         default: unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
     }
 }
