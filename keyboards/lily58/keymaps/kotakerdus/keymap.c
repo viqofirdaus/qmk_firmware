@@ -1,6 +1,6 @@
 /*
 * Author      : kotakerdus
-* Version     : 0.2.6
+* Version     : 0.2.7
 * OS          : Windows 10
 * Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
 *               - Snipaste (screenshot app that is able to pin the screenshot on screen)
