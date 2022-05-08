@@ -429,10 +429,10 @@ void render_master(void) {
     };
 
     static const char PROGMEM separator[2][11] = {
-        { 0xaa, 0xd0, 0xd1, 0xd2, 0xaa,
-          0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0 }, // Normal (0)
         { 0xaa, 0x1d, 0x1e, 0x1f, 0xaa,
-          0xaa, 0x3d, 0x3e, 0x3f, 0xaa, 0 }  // Caps   (1)
+          0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0 }, // Normal (0)
+        { 0xaa, 0x3d, 0x3e, 0x3f, 0xaa,
+          0xaa, 0x5d, 0x5e, 0x5f, 0xaa, 0 }  // Caps   (1)
     };
     static const char PROGMEM layer_state[5][6] = {
         { 0x14, 0x15, 0x16, 0x17, 0x18, 0 }, // QWERT  (0)
@@ -442,12 +442,13 @@ void render_master(void) {
         { 0x94, 0x95, 0x96, 0x97, 0x98, 0 }  // MOUSE  (4)
     };
 
-    static const char PROGMEM mod_blank[]      = { 0xaa, 0xaa, 0 };
-    static const char PROGMEM mod_gui[2][3]    = {{ 0x19, 0x1a, 0 }, { 0x39, 0x3a, 0 }};
-    static const char PROGMEM mod_alt[2][3]    = {{ 0x1b, 0x1c, 0 }, { 0x3b, 0x3c, 0 }};
-    static const char PROGMEM mod_ctrl[2][3]   = {{ 0x59, 0x5a, 0 }, { 0x79, 0x7a, 0 }};
-    static const char PROGMEM mod_shift[2][3]  = {{ 0x5b, 0x5c, 0 }, { 0x7b, 0x7c, 0 }};
-    static const char PROGMEM auto_shift[2][3] = {{ 0x9b, 0x9c, 0 }, { 0xbb, 0xbc, 0 }};
+    static const char PROGMEM mod_blank[]           = { 0xaa, 0xaa, 0 };
+    static const char PROGMEM mod_gui[2][3]         = {{ 0x19, 0x1a, 0 }, { 0x39, 0x3a, 0 }};
+    static const char PROGMEM mod_alt[2][3]         = {{ 0x1b, 0x1c, 0 }, { 0x3b, 0x3c, 0 }};
+    static const char PROGMEM mod_ctrl[2][3]        = {{ 0x59, 0x5a, 0 }, { 0x79, 0x7a, 0 }};
+    static const char PROGMEM mod_shift[2][3]       = {{ 0x5b, 0x5c, 0 }, { 0x7b, 0x7c, 0 }};
+    static const char PROGMEM mod_auto[2][3]        = {{ 0x9b, 0x9c, 0 }, { 0xbb, 0xbc, 0 }};
+    static const char PROGMEM mod_shift_auto[2][3]  = {{ 0x99, 0x9a, 0 }, { 0xb9, 0xba, 0 }};
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
@@ -469,14 +470,24 @@ void render_master(void) {
     oled_write_P(mods & MOD_MASK_ALT  ? mod_alt[1]  : mod_blank, false);
     oled_write_P(mods & MOD_MASK_CTRL ? mod_ctrl[0] : mod_blank, false);
     oled_advance_char();
-    if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift[0], false);
-    else if (get_autoshift_state()) oled_write_P(auto_shift[0], false);
-    else oled_write_P(mod_blank, false);
+    if (get_autoshift_state()) {
+        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift_auto[0], false);
+        else                       oled_write_P(mod_auto[0], false);
+    } else {
+        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift[0], false);
+        else                       oled_write_P(mod_blank, false);
+    }
+
     oled_write_P(mods & MOD_MASK_CTRL  ? mod_ctrl[1]  : mod_blank, false);
     oled_advance_char();
-    if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift[1], false);
-    else if (get_autoshift_state()) oled_write_P(auto_shift[1], false);
-    else oled_write_P(mod_blank, false);
+
+    if (get_autoshift_state()) {
+        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift_auto[1], false);
+        else                       oled_write_P(mod_auto[1], false);
+    } else {
+        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift[1], false);
+        else                       oled_write_P(mod_blank, false);
+    }
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
