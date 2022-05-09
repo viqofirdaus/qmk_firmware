@@ -114,7 +114,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUSE] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_ESC , _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, KC_SLEP,
+             KC_ESC , _______, _______, _______, _______, _______,                         _______, _______, _______, _______, _______, KC_SLEP,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         _______, _______, KC_WH_U, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -148,11 +148,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (tabbing) {
                     tap_code16(S(KC_TAB));
                     return false;
-                } else if (mods & MOD_MASK_ALT) {
-                    tap_code(KC_F4); // Trigger A(KC_F4)
-                    return false;
                 } else if (mods & MOD_BIT(KC_LGUI)) {
                     tap_code16(S(KC_RGHT)); // Trigger G(S(KC_RGHT))
+                    return false;
+                } else if (mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT)) {
+                    tap_code(KC_GRV); // Might useful for shortcut
                     return false;
                 }
             } break;
