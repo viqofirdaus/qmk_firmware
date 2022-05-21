@@ -33,7 +33,7 @@ enum custom_keycodes {
     MS_SPED               // KC_ACL0           | KC_BTN3 if tapped
 };
 
-// KC_ESC | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | S(KC_TAB) if alt/ctrl-tabbing | A(KC_F4) if ALT-tapped
+// KC_ESC | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | S(KC_TAB) if alt/ctrl-tabbing
 #define SP_SNIP KC_F13
 #define WN_CLSE A(KC_F4)
 #define WN_MAXI G(KC_UP)
@@ -74,9 +74,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
              KC_GRV , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             SP_SNIP, KC_PMNS, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
+             SP_SNIP, KC_PDOT, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, LT_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PDOT,                         _______, _______, _______, _______, _______, _______,
+             _______, LT_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, KC_P0  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
@@ -118,11 +118,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         _______, _______, KC_WH_U, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         _______, KC_BTN1, MS_SPED, KC_BTN2, _______, _______,
+             KC_LCTL, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         _______, KC_BTN1, MS_SPED, KC_BTN2, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_ENT , _______,       _______, _______, KC_BTN4, KC_WH_D, KC_BTN5, _______, _______,
+             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_ENT , _______,       _______, _______, KC_BTN4, KC_WH_D, KC_BTN5, _______, KC_RSFT,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, _______, _______
+                                        KC_LALT, KC_LGUI, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     )
 };
@@ -149,7 +149,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     tap_code16(S(KC_TAB));
                     return false;
                 } else if (mods & MOD_BIT(KC_LGUI)) {
-                    tap_code16(S(KC_RGHT)); // Trigger G(S(KC_RGHT))
+                    tap_code16(S(KC_RGHT)); // Trigger G(S(KC_RGHT)) (move current active window to next monitor)
                     return false;
                 } else if (mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT)) {
                     tap_code(KC_GRV); // Might useful for shortcut
@@ -442,13 +442,13 @@ void render_master(void) {
         { 0x94, 0x95, 0x96, 0x97, 0x98, 0 }  // MOUSE  (4)
     };
 
-    static const char PROGMEM mod_blank[]           = { 0xaa, 0xaa, 0 };
-    static const char PROGMEM mod_gui[2][3]         = {{ 0x19, 0x1a, 0 }, { 0x39, 0x3a, 0 }};
-    static const char PROGMEM mod_alt[2][3]         = {{ 0x1b, 0x1c, 0 }, { 0x3b, 0x3c, 0 }};
-    static const char PROGMEM mod_ctrl[2][3]        = {{ 0x59, 0x5a, 0 }, { 0x79, 0x7a, 0 }};
-    static const char PROGMEM mod_shift[2][3]       = {{ 0x5b, 0x5c, 0 }, { 0x7b, 0x7c, 0 }};
-    static const char PROGMEM mod_auto[2][3]        = {{ 0x9b, 0x9c, 0 }, { 0xbb, 0xbc, 0 }};
-    static const char PROGMEM mod_shift_auto[2][3]  = {{ 0x99, 0x9a, 0 }, { 0xb9, 0xba, 0 }};
+    static const char PROGMEM mod_blank[]          = { 0xaa, 0xaa, 0 };
+    static const char PROGMEM mod_gui[2][3]        = {{ 0x19, 0x1a, 0 }, { 0x39, 0x3a, 0 }};
+    static const char PROGMEM mod_alt[2][3]        = {{ 0x1b, 0x1c, 0 }, { 0x3b, 0x3c, 0 }};
+    static const char PROGMEM mod_ctrl[2][3]       = {{ 0x59, 0x5a, 0 }, { 0x79, 0x7a, 0 }};
+    static const char PROGMEM mod_shift[2][3]      = {{ 0x5b, 0x5c, 0 }, { 0x7b, 0x7c, 0 }};
+    static const char PROGMEM mod_auto[2][3]       = {{ 0x9b, 0x9c, 0 }, { 0xbb, 0xbc, 0 }};
+    static const char PROGMEM mod_shift_auto[2][3] = {{ 0x99, 0x9a, 0 }, { 0xb9, 0xba, 0 }};
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
