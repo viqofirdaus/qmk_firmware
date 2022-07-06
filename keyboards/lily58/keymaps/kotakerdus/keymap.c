@@ -1,9 +1,9 @@
 /*
 * Author      : kotakerdus
-* Version     : 0.2.7
+* Version     : 0.3.1
 * OS          : Windows 10
 * Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
-*               - Snipaste (screenshot app that is able to pin the screenshot on screen)
+*               - Snipaste (screenshot app that is able to pin the screenshot on screen. KC_F13 as its shortcut)
 *               - ViRb3 SylphyHornEx (windows's task view management app, ie: move window to right desktop view)
 * Keyboard    : lily58
 * Description : Custom lily58 keyboard focusing on left hand layout + mouse, useful for work that demands on mouse usage like Blender,
@@ -16,24 +16,26 @@
 #include QMK_KEYBOARD_H
 enum layer_number {
     _QWERTY = 0,
-    _SWAP, _NUM, _LNAV, _RNAV, _MOUSE
+    _SWAP, _NUMP, _LNAV, _RNAV, _MOUSE
 };
 
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 enum custom_keycodes {
-    MD_LCTL = SAFE_RANGE, // LCTL_T(KC_CAPS)                                      | LCTL_T(KC_QUOT) in _SWAP
-    MD_LSFT,              // SFT_T(OSL(_SWAP)) | LSFT_T(KC_LPRN) in _NUM or _RNAV | LSFT_T(KC_EQL) in _SWAP
-    MD_RSFT,              // RSFT_T(KC_EQL)    | RSFT_T(KC_RPRN) in _NUM or _RNAV
-    MD_LALT,              // KC_LALT           | G(C(KC_LEFT)) if LGUI-tapped
-    MD_LGUI,              // KC_LGUI
-    LT_NUMP,              // LT(_NUM, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped     | Cancel _SWAP layer (won't trigger KC_BSPC if tapped)
+    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) | LCTL_T(KC_CAPS) in _NUMP                | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP layer
+    MD_LSFT,              // LSFT_T             | LSFT_T(KC_LPRN) in _NUMP or _RNAV       | LSFT_T(KC_EQL) in _SWAP  & toggle _SWAP layer
+    MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if LGUI-tapped                                       & toggle _SWAP layer
+    MD_LGUI,              // KC_LGUI                                                                                 & toggle _SWAP layer
+    LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped            | Cancel _SWAP layer (won't trigger KC_BSPC if tapped)
     LT_LNAV,              // LT(_LNAV, KC_DEL)
     LT_RNAV,              // LT(_RNAV, KC_DEL)
-    MS_SPED               // KC_ACL0           | KC_BTN3 if tapped
+    KY_MPLY,              // KC_MPLY if tapped & can be hold then tap KC_HOME or KC_END for media control
+    MS_SPED               // KC_ACL0            | KC_BTN3 if tapped
 };
 
-// KC_ESC | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | S(KC_TAB) if alt/ctrl-tabbing
+// KC_ESC  | G(S(KC_RGHT)) if LGUI-tapped (move current active window to next monitor) | S(KC_TAB) in alt/ctrl-tabbing
+// KC_HOME | KC_MPRV if KY_MPLY-tapped
+// KC_END  | KC_MNXT if KY_MPLY-tapped
 #define SP_SNIP KC_F13
 #define WN_CLSE A(KC_F4)
 #define WN_MAXI G(KC_UP)
@@ -50,7 +52,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              MD_LCTL, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   ,                         KC_H   , KC_J   , KC_K   , KC_L   , KC_SCLN, KC_QUOT,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             MD_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, MD_RSFT,
+             MD_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         MD_LALT, MD_LGUI, LT_NUMP, KC_SPC ,       KC_ENT , LT_RNAV, KC_RGUI, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -70,7 +72,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
-    [_NUM] = LAYOUT (
+    [_NUMP] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
              KC_GRV , KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -92,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_APP , KC_HOME, KC_MPLY, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
+             _______, KC_APP , KC_HOME, KY_MPLY, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -106,7 +108,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, _______, _______, _______, _______,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , WN_MINI,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, KC_MPLY, KC_END , KC_APP , _______,
+             _______, _______, _______, _______, _______, _______, _______,       _______, KC_VOLD, KC_HOME, KY_MPLY, KC_END , KC_APP , KC_RPRN,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -120,7 +122,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              KC_LCTL, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         _______, KC_BTN1, MS_SPED, KC_BTN2, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_ENT , _______,       _______, _______, KC_BTN4, KC_WH_D, KC_BTN5, _______, KC_RSFT,
+             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_ENT , _______,       _______, _______, KC_BTN4, KC_WH_D, KC_BTN5, _______, XXXXXXX,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         KC_LALT, KC_LGUI, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -135,7 +137,8 @@ bool tabbing = false;
 // Boolean for checking on quick rolling-key on MD_* keys combo with LT_* keys
 bool mod_before_layer = false; // ie: MD_LCTL(▼) ⟶ LT_NUMP(▼) ⟶ MD_LCTL(▲) ⟶ LT_NUMP(▲) = C(KC_BSPC) instead of (KC_BSPC)
 bool mod_after_layer = false;  // ie: LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲) ⟶ MD_LSFT(▲) = S(KC_9) instead of S(KC_BSPC)
-// This block un-intended trigger on custom key while quick rolling-key on common shortcut (ie: CTRL + Z would not trigger KC_CAPS
+bool media_control = false;
+// This block un-intended trigger on custom key while quick rolling-key on common shortcut (ie: CTRL + Z would not trigger OSL(_SWAP)
 bool other_key_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods = get_mods();
@@ -159,16 +162,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MD_LCTL:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
+                // mod_after_layer checking point
+                if (layer_state_is(_NUMP) || layer_state_is(_RNAV)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LCTL);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_before_layer is for triggering C(KC_BSPC) on quick-rolling MD_LCTL(▼) ⟶ LT_NUMP(▼) ⟶ MD_LCTL(▲)
+                    // mod_before_layer here is for triggering quick-rolling MD_LCTL(▼) ⟶ LT_NUMP(▼) ⟶ MD_LCTL(▲)
                     if (mod_before_layer) {
-                        if (layer_state_is(_NUM)) tap_code(KC_BSPC);
+                        if (layer_state_is(_NUMP)) tap_code(KC_BSPC); // This will trigger KC_LCTL + KC_BSPC
                         else if (layer_state_is(_RNAV)) tap_code(KC_DEL);
-                    } else if (layer_state_is(_QWERTY) && (mods == MOD_BIT(KC_LCTL))) tap_code(KC_CAPS); // Toggle if no other mod is pressed
+                    } else if (layer_state_is(_NUMP)) tap_code(KC_CAPS);
+                    else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
                     else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_BIT(KC_LCTL));
                         tap_code(KC_QUOT);
@@ -184,15 +189,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MD_LSFT:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                // mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
-                if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
+                // mod_after_layer checking point
+                if (layer_state_is(_NUMP) || layer_state_is(_RNAV)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if ((layer_state_is(_NUM) || layer_state_is(_RNAV)) && mod_after_layer) tap_code(KC_9); // S(KC_9) - Open parenthesis
-                    else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
-                    else if (layer_state_is(_SWAP)) {
+                    // mod_after_layer here is for blocking quick-rolling MD_LSFT(▼) ⟶ LT_NUMP(▼) ⟶ MD_LSFT(▲)
+                    if (mod_after_layer) {
+                        if (layer_state_is(_NUMP)) tap_code(KC_9); // Only work if tapped in _NUMP layer
+                    } else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
                         if (mods == MOD_BIT(KC_LSFT)) layer_off(_SWAP);
@@ -200,38 +206,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
                 unregister_code(KC_LSFT);
-                other_key_pressed = true;
-            } break;
-        case MD_RSFT:
-            if (record -> event.pressed) {
-                other_key_pressed = false;
-                if (layer_state_is(_NUM) || layer_state_is(_RNAV)) mod_after_layer = true;
-                else if (layer_state_is(_QWERTY) && (mods & MOD_BIT(KC_LSFT))) {
-                    tap_code(KC_EQL); // Trigger S(KC_EQL)
-                    return false;
-                }
-
-                key_timer = timer_read();
-                register_code(KC_RSFT);
-            } else {
-                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if ((layer_state_is(_NUM) || layer_state_is(_RNAV)) && mod_after_layer) tap_code(KC_0); // S(KC_0) - Close parenthesis
-                    else if (layer_state_is(_QWERTY) || layer_state_is(_SWAP)) {
-                        del_mods(MOD_BIT(KC_RSFT));
-                        tap_code(KC_EQL);
-                        if (layer_state_is(_SWAP))
-                            if (mods == MOD_BIT(KC_RSFT)) layer_off(_SWAP);
-                    }
-                } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
-
-                unregister_code(KC_RSFT);
+                mod_before_layer = false;
                 other_key_pressed = true;
             } break;
         case MD_LALT:
             if (record -> event.pressed) {
                 other_key_pressed = false;
                 if (mods & MOD_BIT(KC_LGUI)) {
-                    if (layer_state_is(_NUM)) tap_code16(A(C(KC_LEFT))); // SylphyHorn shortcut to move both window and desktop to the left
+                    if (layer_state_is(_NUMP)) tap_code16(A(C(KC_LEFT))); // SylphyHorn shortcut to move both window and desktop to the left
                     else tap_code16(C(KC_LEFT));
                     return false;
                 }
@@ -267,42 +249,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     return false;
                 }
 
-                // Make sure to add MOD_MASK* for related mod key you want to add quick-rolling behaviour to work
+                // mod_before_layer checking point
                 if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
-                layer_on(_NUM);
+                layer_on(_NUMP);
             } else {
-                layer_off(_NUM);
+                layer_off(_NUMP);
                 layer_off(_LNAV);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(▼) ⟶ MD_LSFT/MD_RSFT(▼) ⟶ LT_NUMP(▲)
+                    // mod_before_layer here is for triggering quick-rolling MD_LCTL(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
                     if (mod_after_layer) {
-                        if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9); // S(KC_9) - Open parenthesis
-                        else if (mods & MOD_BIT(KC_RSFT)) tap_code(KC_0); // S(KC_0) - Close parenthesis
+                        if (mods & MOD_BIT(KC_LCTL)) tap_code(KC_CAPS);
+                        else if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9); // S(KC_9) - Open parenthesis
                     } else if (!layer_state_is(_SWAP)) tap_code(KC_BSPC);
                 }
 
                 layer_off(_SWAP);
-                mod_after_layer = false;
-                other_key_pressed = true;
-            } break;
-        case LT_RNAV:
-            if (record -> event.pressed) {
-                other_key_pressed = false;
-                // Make sure to add MOD_MASK for related mod key you want to add quick-rolling behaviour to work
-                if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
-                key_timer = timer_read();
-                layer_on(_RNAV);
-            } else {
-                layer_off(_RNAV);
-                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_after_layer is for triggering S(KC_9) or S(KC_0) on quick-rolling LT_NUMP(▼) ⟶ MD_LSFT/MD_RSFT(▼) ⟶ LT_NUMP(▲)
-                    if (mod_after_layer) {
-                        if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9); // S(KC_9) - Open parenthesis
-                        else if (mods & MOD_BIT(KC_RSFT)) tap_code(KC_0); // S(KC_0) - Close parenthesis
-                    } else tap_code(KC_DEL);
-                }
-
                 mod_after_layer = false;
                 other_key_pressed = true;
             } break;
@@ -315,6 +277,40 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_LNAV);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_DEL);
                 other_key_pressed = true;
+            } break;
+        case LT_RNAV:
+            if (record -> event.pressed) {
+                other_key_pressed = false;
+                key_timer = timer_read();
+                layer_on(_RNAV);
+            } else {
+                layer_off(_RNAV);
+                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_DEL);
+                other_key_pressed = true;
+            } break;
+        case KY_MPLY:
+            if (record -> event.pressed) {
+                other_key_pressed = false;
+                key_timer = timer_read();
+                media_control = true;
+            } else {
+                media_control = false;
+                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_MPLY);
+                other_key_pressed = true;
+            } break;
+        case KC_HOME:
+            if (record -> event.pressed) {
+                if (media_control) {
+                    tap_code(KC_MPRV);
+                    return false;
+                }
+            } break;
+        case KC_END:
+            if (record -> event.pressed) {
+                if (media_control) {
+                    tap_code(KC_MNXT);
+                    return false;
+                }
             } break;
         case MS_SPED:
             if (record -> event.pressed) {
@@ -337,7 +333,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    return update_tri_layer_state(state, _NUM, _RNAV, _MOUSE);
+    return update_tri_layer_state(state, _NUMP, _RNAV, _MOUSE);
 }
 
 // A U T O  S H I F T |-------------------------------------------------------------------------------------------------------------------------
@@ -346,11 +342,11 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 bool get_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_1 ... KC_0:
+        case KC_TAB:
         case KC_MINUS ... KC_SLASH:
         case KC_NONUS_BACKSLASH:
             return true; // Only enable Auto Shift on these keys
         case KC_A ... KC_Z:
-        case KC_TAB:
             return false;
     }
 
@@ -458,7 +454,7 @@ void render_master(void) {
     // Layer names
     if (layer_state_is(_MOUSE))                              oled_write_P(layer_state[4], false);
     else if (layer_state_is(_LNAV) || layer_state_is(_RNAV)) oled_write_P(layer_state[3], false);
-    else if (layer_state_is(_NUM))                           oled_write_P(layer_state[2], false);
+    else if (layer_state_is(_NUMP))                          oled_write_P(layer_state[2], false);
     else if (layer_state_is(_SWAP))                          oled_write_P(layer_state[1], false);
     else                                                     oled_write_P(layer_state[0], false);
 
