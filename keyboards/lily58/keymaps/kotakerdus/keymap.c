@@ -22,14 +22,14 @@ enum layer_number {
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 enum custom_keycodes {
-    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) | LCTL_T(KC_CAPS) in _NUMP                | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP layer
-    MD_LSFT,              // LSFT_T             | LSFT_T(KC_LPRN) in _NUMP or _RNAV       | LSFT_T(KC_EQL) in _SWAP  & toggle _SWAP layer
-    MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if LGUI-tapped                                       & toggle _SWAP layer
-    MD_LGUI,              // KC_LGUI                                                                                 & toggle _SWAP layer
-    LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped            | Cancel _SWAP layer (won't trigger KC_BSPC if tapped)
+    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP))                                | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP layer
+    MD_LSFT,              // LSFT_T(KC_CAPS)    | LSFT_T(KC_LPRN) in _NUMP     | LSFT_T(KC_EQL) in _SWAP  & toggle _SWAP layer
+    MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if LGUI-tapped                            & toggle _SWAP layer
+    MD_LGUI,              // KC_LGUI                                                                      & toggle _SWAP layer
+    LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped | Cancel _SWAP layer (won't trigger KC_BSPC if tapped)
     LT_LNAV,              // LT(_LNAV, KC_DEL)
     LT_RNAV,              // LT(_RNAV, KC_DEL)
-    KY_MPLY,              // KC_MPLY if tapped & can be hold then tap KC_HOME or KC_END for media control
+    KY_MPLY,              // KC_MPLY if tapped  & can be combined with KC_HOME or KC_END for media control key
     MS_SPED               // KC_ACL0            | KC_BTN3 if tapped
 };
 
@@ -162,8 +162,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MD_LCTL:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                // mod_after_layer checking point
-                if (layer_state_is(_NUMP) || layer_state_is(_RNAV)) mod_after_layer = true;
+                if (layer_state_is(_NUMP)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LCTL);
             } else {
@@ -172,8 +171,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     if (mod_before_layer) {
                         if (layer_state_is(_NUMP)) tap_code(KC_BSPC); // This will trigger KC_LCTL + KC_BSPC
                         else if (layer_state_is(_RNAV)) tap_code(KC_DEL);
-                    } else if (layer_state_is(_NUMP)) tap_code(KC_CAPS);
-                    else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
+                    } else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
                     else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_BIT(KC_LCTL));
                         tap_code(KC_QUOT);
@@ -189,20 +187,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MD_LSFT:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                // mod_after_layer checking point
-                if (layer_state_is(_NUMP) || layer_state_is(_RNAV)) mod_after_layer = true;
+                if (layer_state_is(_NUMP)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_after_layer here is for blocking quick-rolling MD_LSFT(▼) ⟶ LT_NUMP(▼) ⟶ MD_LSFT(▲)
+                    // mod_after_layer only trigger if pressed in _NUMP layer or quick rolling LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
                     if (mod_after_layer) {
                         if (layer_state_is(_NUMP)) tap_code(KC_9); // Only work if tapped in _NUMP layer
                     } else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
                         if (mods == MOD_BIT(KC_LSFT)) layer_off(_SWAP);
-                    }
+                    } else if (layer_state_is(_QWERTY)) tap_code(KC_CAPS);
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
                 unregister_code(KC_LSFT);
@@ -259,8 +256,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     // mod_before_layer here is for triggering quick-rolling MD_LCTL(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
                     if (mod_after_layer) {
-                        if (mods & MOD_BIT(KC_LCTL)) tap_code(KC_CAPS);
-                        else if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9); // S(KC_9) - Open parenthesis
+                        if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9); // S(KC_9) - Open parenthesis
                     } else if (!layer_state_is(_SWAP)) tap_code(KC_BSPC);
                 }
 
@@ -281,6 +277,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LT_RNAV:
             if (record -> event.pressed) {
                 other_key_pressed = false;
+                if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
                 layer_on(_RNAV);
             } else {
