@@ -1,11 +1,15 @@
 /*
 * Author      : kotakerdus
-* Version     : 0.3.1
+* Version     : 0.3.2
 * OS          : Windows 10
 * Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
 *               - Snipaste (screenshot app that is able to pin the screenshot on screen. KC_F13 as its shortcut)
 *               - ViRb3 SylphyHornEx (windows's task view management app, ie: move window to right desktop view)
 * Keyboard    : lily58
+* Features    : - Auto Shift for numbers and symbols but not alphas and all feature below depends on the state of Auto Shift feature
+*               - Swap Hands but customized to work like one-shot key for left side of the keyboard by pressing MD_LCTL key once & won't break
+*                 out of one-shot key if pressed with MOD key (ie: SHIFT)
+*               - Caps Word is like CAPSLOCK but way more awesome!
 * Description : Custom lily58 keyboard focusing on left hand layout + mouse, useful for work that demands on mouse usage like Blender,
 *               Photoshop and many other design application. This layout has _SWAP layer that work like QMK's OSL which useful for trigger
 *               a shortcut without having to reach the other half of the keyboard.
@@ -22,11 +26,11 @@ enum layer_number {
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 enum custom_keycodes {
-    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP))                                | LCTL_T(KC_QUOT) in _SWAP & toggle _SWAP layer
-    MD_LSFT,              // LSFT_T(KC_CAPS)    | LSFT_T(KC_LPRN) in _NUMP     | LSFT_T(KC_EQL) in _SWAP  & toggle _SWAP layer
-    MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if LGUI-tapped                            & toggle _SWAP layer
-    MD_LGUI,              // KC_LGUI                                                                      & toggle _SWAP layer
-    LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped | Cancel _SWAP layer (won't trigger KC_BSPC if tapped)
+    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP))                                  | LCTL_T(KC_QUOT) in _SWAP layer
+    MD_LSFT,              // LSFT_T(KC_CAPS)    | LSFT_T(KC_LPRN) in _NUMP layer | LSFT_T(KC_EQL)  in _SWAP layer
+    MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if LGUI-tapped
+    MD_LGUI,              // KC_LGUI
+    LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if LGUI-tapped   | Cancel _SWAP layer (won't trigger KC_BSPC if tapped)
     LT_LNAV,              // LT(_LNAV, KC_DEL)
     LT_RNAV,              // LT(_RNAV, KC_DEL)
     KY_MPLY,              // KC_MPLY if tapped  & can be combined with KC_HOME or KC_END for media control key
@@ -159,6 +163,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     return false;
                 }
             } break;
+        case KC_HOME:
+            if (record -> event.pressed) {
+                if (media_control) {
+                    tap_code(KC_MPRV);
+                    return false;
+                }
+            } break;
+        case KC_END:
+            if (record -> event.pressed) {
+                if (media_control) {
+                    tap_code(KC_MNXT);
+                    return false;
+                }
+            } break;
         case MD_LCTL:
             if (record -> event.pressed) {
                 other_key_pressed = false;
@@ -199,7 +217,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
                         if (mods == MOD_BIT(KC_LSFT)) layer_off(_SWAP);
-                    } else if (layer_state_is(_QWERTY)) tap_code(KC_CAPS);
+                    } else if (get_autoshift_state() && layer_state_is(_QWERTY)) caps_word_toggle();
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP);
 
                 unregister_code(KC_LSFT);
@@ -239,13 +257,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case LT_NUMP:
             if (record -> event.pressed) {
-                other_key_pressed = false;
                 if (mods & MOD_BIT(KC_LGUI)) {
                     other_key_pressed = true;
                     tap_code16(C(KC_RGHT));
                     return false;
                 }
 
+                other_key_pressed = layer_state_is(_RNAV) ? true : false;
                 // mod_before_layer checking point
                 if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
@@ -276,7 +294,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case LT_RNAV:
             if (record -> event.pressed) {
-                other_key_pressed = false;
+                other_key_pressed = layer_state_is(_NUMP) ? true : false;
+                // mod_before_layer checking point
                 if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
                 key_timer = timer_read();
                 layer_on(_RNAV);
@@ -294,20 +313,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 media_control = false;
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_MPLY);
                 other_key_pressed = true;
-            } break;
-        case KC_HOME:
-            if (record -> event.pressed) {
-                if (media_control) {
-                    tap_code(KC_MPRV);
-                    return false;
-                }
-            } break;
-        case KC_END:
-            if (record -> event.pressed) {
-                if (media_control) {
-                    tap_code(KC_MNXT);
-                    return false;
-                }
             } break;
         case MS_SPED:
             if (record -> event.pressed) {
@@ -342,7 +347,7 @@ bool get_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
         case KC_TAB:
         case KC_MINUS ... KC_SLASH:
         case KC_NONUS_BACKSLASH:
-            return true; // Only enable Auto Shift on these keys
+            return true; // Only enable Auto Shift on these keys above
         case KC_A ... KC_Z:
             return false;
     }
@@ -379,6 +384,31 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
         case KC_PENT: unregister_code16((!shifted) ? KC_PENT : KC_EQL);  break;
         case KC_PDOT: unregister_code16((!shifted) ? KC_PDOT : KC_COMM); break;
         default: unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
+}
+
+// C A P S  W O R D |---------------------------------------------------------------------------------------------------------------------------
+// https://docs.qmk.fm/#/feature_caps_word
+
+bool caps_word_press_user(uint16_t keycode) {
+    switch (keycode) {
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
+            return true;
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_P1 ... KC_P0:
+        case KC_RGHT ... KC_UP:
+        case KC_MINS:
+        case MD_LSFT:
+        case LT_NUMP:
+        case LT_RNAV:
+        case LT_LNAV:
+            return true;
+        // Other key will deactive the Caps Word.
+        default:
+            return false;
     }
 }
 
@@ -445,8 +475,8 @@ void render_master(void) {
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
-    if (host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) oled_write_P(separator[1], false);
-    else                                                 oled_write_P(separator[0], false);
+    if ((host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) || is_caps_word_on()) oled_write_P(separator[1], false);
+    else                                                                        oled_write_P(separator[0], false);
 
     // Layer names
     if (layer_state_is(_MOUSE))                              oled_write_P(layer_state[4], false);
