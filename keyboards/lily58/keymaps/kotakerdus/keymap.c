@@ -29,7 +29,7 @@ enum custom_keycodes {
     MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if MD_LGUI tapped
     MD_LGUI,              // KC_LGUI            & Can be combined with MD_LALT or LT_NUMP for desktop switching
     LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if MD_LGUI tapped | Turn _SWAP layer off (won't trigger KC_BSPC if tapped)
-    LT_LNAV, LT_NAVI,     // LT(_NAVI, KC_DEL)  | Turn _MOUSE layer on if pressed together both LT_NUMP & LT_NAVI
+    LT_LNAV, LT_RNAV,     // LT(_NAVI, KC_DEL)  | Turn _MOUSE layer on if pressed together both LT_NUMP & LT_RNAV
     KY_MPLY,              // KC_MPLY            & Can be combined with KC_HOME or KC_END for media control (next & previous track)
     KY_SPED               // KC_ACL0            | KC_BTN3 if tapped
 };
@@ -53,7 +53,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              MD_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        MD_LALT, MD_LGUI, LT_NUMP, KC_SPC ,       KC_ENT , LT_NAVI, KC_RGUI, KC_RALT
+                                        MD_LALT, MD_LGUI, LT_NUMP, KC_SPC ,       KC_ENT , LT_RNAV, KC_RGUI, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -67,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, KC_SLSH, KC_DOT , KC_COMM, KC_M   , KC_N   , KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, _______, _______
+                                        KC_RALT, KC_RGUI, LT_RNAV, KC_ENT ,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -167,9 +167,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 register_code(KC_LCTL);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_before_layer here is for triggering quick-rolling MD_LCTL(▼) ⟶ LT_NUMP(▼) ⟶ MD_LCTL(▲)
+                    // mod_before_layer is for triggering quick-rolling MD_LCTL(▼) ⟶ LT_NUMP(▼) or LT_RNAV(▼) ⟶ MD_LCTL(▲)
+                    // which then trigger C(KC_BSPC) or C(KC_DEL)
                     if (mod_before_layer) {
-                        if (layer_state_is(_NUMP)) tap_code(KC_BSPC); // This will trigger KC_LCTL + KC_BSPC
+                        if (layer_state_is(_NUMP)) tap_code(KC_BSPC);
                         else if (layer_state_is(_NAVI)) tap_code(KC_DEL);
                     } else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
                     else if (layer_state_is(_SWAP)) {
@@ -187,14 +188,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MD_LSFT:
             if (record -> event.pressed) {
                 other_key_pressed = false;
-                if (layer_state_is(_NUMP)) mod_after_layer = true;
+                if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) mod_after_layer = true;
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_after_layer only trigger if pressed in _NUMP layer or quick rolling LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
+                    // mod_after_layer only trigger if the key is pressed in _NUMP or _NAVI layer
+                    // which trigger S(KC_9) on MD_LSFT(▲)
                     if (mod_after_layer) {
-                        if (layer_state_is(_NUMP)) tap_code(KC_9); // Only work if tapped in _NUMP layer
+                        if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) tap_code(KC_9);
                     } else if (layer_state_is(_SWAP)) {
                         del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
@@ -256,9 +258,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_NUMP);
                 update_tri_layer(_NUMP, _NAVI, _MOUSE);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    // mod_before_layer here is for triggering quick-rolling MD_LCTL(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
+                    // mod_before_layer is for triggering quick-rolling LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲)
+                    // which then trigger S(KC_9) on LT_NUMP(▲)
                     if (mod_after_layer) {
-                        if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9); // S(KC_9) - Open parenthesis
+                        if (mods & MOD_BIT(KC_LSFT)) tap_code(KC_9);
                     } else if (!layer_state_is(_SWAP)) tap_code(KC_BSPC);
                 }
 
@@ -276,7 +279,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_NAVI);
                 if (timer_elapsed(key_timer) < TAPPING_TERM) tap_code(KC_DEL);
             } break;
-        case LT_NAVI:
+        case LT_RNAV:
             if (record -> event.pressed) {
                 other_key_pressed = layer_state_is(_NUMP) ? true : false;
                 // mod_before_layer checking point
@@ -387,7 +390,7 @@ bool caps_word_press_user(uint16_t keycode) {
         case MD_LSFT:
         case LT_NUMP:
         case LT_LNAV:
-        case LT_NAVI:
+        case LT_RNAV:
             return true;
         // Other key will deactive the Caps Word.
         default:
@@ -462,11 +465,11 @@ void render_master(void) {
     else                                                                        oled_write_P(separator[0], false);
 
     // Layer names
-    if (layer_state_is(_MOUSE))     oled_write_P(layer_state[4], false);
-    else if (layer_state_is(_NAVI)) oled_write_P(layer_state[3], false);
-    else if (layer_state_is(_NUMP)) oled_write_P(layer_state[2], false);
-    else if (layer_state_is(_SWAP)) oled_write_P(layer_state[1], false);
-    else                            oled_write_P(layer_state[0], false);
+    if      (layer_state_is(_MOUSE)) oled_write_P(layer_state[4], false);
+    else if (layer_state_is(_NAVI))  oled_write_P(layer_state[3], false);
+    else if (layer_state_is(_NUMP))  oled_write_P(layer_state[2], false);
+    else if (layer_state_is(_SWAP))  oled_write_P(layer_state[1], false);
+    else                             oled_write_P(layer_state[0], false);
 
     // Mods & AutoShift indicator
     const uint8_t mods = get_mods();
