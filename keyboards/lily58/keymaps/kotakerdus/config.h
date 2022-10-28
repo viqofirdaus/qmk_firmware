@@ -8,7 +8,6 @@
 
 #define TAPPING_TERM 150
 #define AUTO_SHIFT_TIMEOUT 200
-#define CAPS_WORD_IDLE_TIMEOUT 0
 
 // Liyang's fork on Kinetic Mouse
 // Using Liyang's mousekey.c & mousekey.h custom build

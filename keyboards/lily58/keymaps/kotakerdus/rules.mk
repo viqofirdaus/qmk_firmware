@@ -1,11 +1,11 @@
 AUTO_SHIFT_ENABLE = yes
-CAPS_WORD_ENABLE = yes
 OLED_ENABLE = yes
 EXTRAKEY_ENABLE = yes
 MOUSEKEY_ENABLE = yes
 
 # Optimization - https://docs.qmk.fm/#/squeezing_avr
 LTO_ENABLE = yes
+CAPS_WORD_ENABLE = no
 CONSOLE_ENABLE = no
 COMMAND_ENABLE = no
 SPACE_CADET_ENABLE = no

@@ -6,7 +6,6 @@
 //               - ViRb3 SylphyHornEx (windows's task view management app, ie: move window to right desktop view)
 // Keyboard    : lily58
 // Features    : - Auto Shift for numbers and symbols but not alphas
-//               - Caps Word is like CAPSLOCK but supercharged (disabled if Auto Shift is disabled as well)
 //               - Swap Hands but customized to work like one-shot key for left side of the keyboard by pressing MD_LCTL key once & won't break
 //                 out of one-shot key state if pressed with MOD key (ie: possible to type SHIFT + i)
 // Description : Custom lily58 keyboard focusing on left hand layout + mouse, useful for work that demands on mouse usage like Blender,
@@ -25,7 +24,7 @@ enum layer_number {
 
 enum custom_keycodes {
     MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) | LCTL_T(KC_QUOT) in _SWAP layer
-    MD_LSFT,              // LSFT_T(CAPSWRD)    | LSFT_T(KC_EQL)  in _SWAP layer  | LSFT_T(KC_LPRN) in _NUMP layer
+    MD_LSFT,              // LSFT_T(KC_CAPS)    | LSFT_T(KC_EQL)  in _SWAP layer  | LSFT_T(KC_LPRN) in _NUMP layer
     MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if MD_LGUI tapped
     MD_LGUI,              // KC_LGUI            & Can be combined with MD_LALT or LT_NUMP for desktop navigation
     LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if MD_LGUI tapped | Turn _SWAP layer off (won't trigger KC_BSPC if tapped)
@@ -64,7 +63,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, KC_SLSH, KC_DOT , KC_COMM, KC_M   , KC_N   , KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KC_RALT, KC_RGUI, LT_RNAV, KC_ENT ,       _______, _______, _______, _______
+                                        _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -90,9 +89,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         KC_MUTE, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 , KC_NUM ,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_NUM , KC_HOME, KC_MPLY, KC_END , KC_ENT , _______,       _______, KC_VOLD, KC_HOME, KC_MPLY, KC_END , KC_INS , KC_RPRN,
+             _______, KC_NUM , KC_HOME, KC_MPLY, KC_END , KC_ENT , _______,       _______, KC_VOLD, KC_HOME, KC_MPLY, KC_END , KC_APP , KC_RPRN,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, KC_APP , _______
+                                        _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -118,7 +117,7 @@ uint16_t key_timer = 0;
 bool tabbing = false;
 // Boolean for checking on quick rolling-key on MD_* keys combo with LT_* keys
 bool mod_before_layer = false; // ie: MD_LCTL(▼) ⟶ LT_NUMP(▼) ⟶ MD_LCTL(▲) ⟶ LT_NUMP(▲) = C(KC_BSPC) instead of (KC_BSPC)
-bool mod_after_layer = false;  // ie: LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲) ⟶ MD_LSFT(▲) = S(KC_9) instead of S(KC_BSPC)
+bool mod_after_layer = false;  // ie: LT_NUMP(▼) ⟶ MD_LSFT(▼) ⟶ LT_NUMP(▲) ⟶ MD_LSFT(▲) = S(KC_9) instead of S(KC_BSPC) due to dual-role key
 // This block un-intended trigger on custom key while quick rolling-key on common shortcut (ie: CTRL + Z would not trigger OSL(_SWAP)
 bool other_key_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -134,9 +133,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     return false;
                 } else if (mods & MOD_BIT(KC_LGUI)) {
                     tap_code16(S(KC_RGHT)); // Trigger G(S(KC_RGHT)) (move current active window to next monitor)
-                    return false;
-                } else if (mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT)) {
-                    tap_code(KC_GRV); // Might useful for shortcut
                     return false;
                 }
             } break;
@@ -182,7 +178,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
                         if (mods == MOD_BIT(KC_LSFT)) layer_off(_SWAP);
-                    } else if (get_autoshift_state() && layer_state_is(_QWERTY)) caps_word_toggle();
+                    } else if (layer_state_is(_QWERTY)) tap_code(KC_CAPS);
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
                 unregister_code(KC_LSFT);
@@ -343,31 +339,6 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
     }
 }
 
-// C A P S  W O R D |---------------------------------------------------------------------------------------------------------------------------
-// https://docs.qmk.fm/#/feature_caps_word
-
-bool caps_word_press_user(uint16_t keycode) {
-    switch (keycode) {
-        // Keycodes that continue Caps Word, with shift applied.
-        case KC_A ... KC_Z:
-            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
-            return true;
-        // Keycodes that continue Caps Word, without shifting.
-        case KC_1 ... KC_0:
-        case KC_P1 ... KC_P0:
-        case KC_RGHT ... KC_UP:
-        case KC_MINS:
-        case MD_LSFT:
-        case LT_NUMP:
-        case LT_LNAV:
-        case LT_RNAV:
-            return true;
-        // Other key will deactive the Caps Word.
-        default:
-            return false;
-    }
-}
-
 // O L E D   I N T E R F A C E |----------------------------------------------------------------------------------------------------------------
 
 #ifdef OLED_ENABLE
@@ -431,8 +402,8 @@ void render_master(void) {
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
-    if ((host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) || is_caps_word_on()) oled_write_P(separator[1], false);
-    else                                                                        oled_write_P(separator[0], false);
+    if ((host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK))) oled_write_P(separator[1], false);
+    else                                                   oled_write_P(separator[0], false);
 
     // Layer names
     if      (layer_state_is(_MOUS)) oled_write_P(layer_state[4], false);
