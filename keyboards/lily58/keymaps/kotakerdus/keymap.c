@@ -1,5 +1,5 @@
 // Author      : kotakerdus
-// Version     : 0.3.5
+// Version     : 0.3.6
 // OS          : Windows 10
 // Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
 //               - Snipaste (screenshot app that is able to pin the screenshot on screen. KC_F13 as its shortcut)
@@ -24,10 +24,9 @@ enum layer_number {
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 enum custom_keycodes {
-    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) | LCTL_T(KC_QUOT) in _SWAP layer
-    MD_RCTL,              // RCTL_T(KC_QUOT)
-    MD_LSFT,              // LSFT_T(CAPSWRD)    | LSFT_T(KC_EQL)  in _SWAP layer  | LSFT_T(KC_LPRN) in _NUMP layer
-    MD_RSFT,              // RSFT_T(KC_EQL)
+    MD_LCTL = SAFE_RANGE, // LCTL_T(OSL(_SWAP)) | LCTL_T(KC_QUOT) in _SWAP layer | S(KC_TAB) while alt_tabbing (select previous)
+    MD_LSFT,              // LSFT_T(CAPSWRD)    | LSFT_T(KC_EQL)  in _SWAP layer | LSFT_T(KC_LPRN) in _NUMP layer
+    MD_RCTL, MD_RSFT,     // RCTL_T(KC_QUOT)    & RSFT_T(KC_EQL)
     MD_LALT,              // KC_LALT            | G(C(KC_LEFT)) if MD_LGUI tapped                                | KC_MPRV in _NUMP layer
     MD_LGUI,              // KC_LGUI            & Can be combined with MD_LALT or LT_NUMP for desktop navigation | KC_MNXT in _NUMP layer
     LT_NUMP,              // LT(_NUMP, KC_BSPC) | G(C(KC_RGHT)) if MD_LGUI tapped | Turn _SWAP layer off (won't trigger KC_BSPC if tapped)
@@ -35,8 +34,7 @@ enum custom_keycodes {
     KY_SPED               // KC_ACL0            | KC_BTN3 if tapped
 };
 
-// KC_TAB               | Initiate alt/ctrl-tabbing state if MD_LCTL or MD_LALT tapped
-// KC_ESC               | G(S(KC_RGHT)) if LGUI tapped (move current active window to next monitor) | S(KC_TAB) in alt/ctrl-tabbing
+// KC_ESC               | G(S(KC_RGHT)) if LGUI tapped (move current window to next monitor) | KC_DEL while alt_tabbing (close selected window)
 // KC_ASTG              | Toggles the state of the Auto Shift and Caps Word features
 #define SP_SNIP KC_F13 // Shortcut for taking a screenshot using Snipaste
 
@@ -128,7 +126,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods = get_mods();
     switch (keycode) {
         case KC_TAB:
-            if (record -> event.pressed && (mods & (MOD_BIT(KC_LALT) | MOD_MASK_CTRL))) tabbing = true;
+            if (record -> event.pressed && (mods & (MOD_BIT(KC_LALT) | MOD_BIT(KC_LCTL)))) tabbing = true;
             break;
         case KC_ESC:
             if (record -> event.pressed) {
@@ -142,6 +140,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_LCTL:
             if (record -> event.pressed) {
+                if (tabbing) {
+                    tap_code(KC_DEL);
+                    other_key_pressed = true;
+                    return false;
+                }
+
                 other_key_pressed = false;
                 if (layer_state_is(_NUMP)) mod_after_layer = true;
                 key_timer = timer_read();
