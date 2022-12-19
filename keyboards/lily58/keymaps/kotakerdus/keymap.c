@@ -65,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              _______, KC_SLSH, KC_DOT , KC_COMM, KC_M   , KC_N   , KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, _______, _______
+                                        _______, _______, _______, KC_ENT ,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -140,104 +140,94 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } break;
         case MD_LCTL:
             if (record -> event.pressed) {
-                if (tabbing) {
-                    tap_code(KC_DEL);
-                    other_key_pressed = true;
-                    return false;
-                }
-
-                other_key_pressed = false;
                 if (layer_state_is(_NUMP)) mod_after_layer = true;
+                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_LCTL);
             } else {
+                unregister_code(KC_LCTL);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     // mod_before_layer is for triggering quick-rolling MD_LCTL(▼) ⟶ LT_NUMP(▼) or LT_RNAV(▼) ⟶ MD_LCTL(▲)
                     // which then trigger C(KC_BSPC) or C(KC_DEL)
                     if (mod_before_layer) {
-                        if (layer_state_is(_NUMP)) tap_code(KC_BSPC);
-                        else if (layer_state_is(_NAVI)) tap_code(KC_DEL);
+                        if (layer_state_is(_NUMP)) tap_code16(C(KC_BSPC));
+                        else if (layer_state_is(_NAVI)) tap_code16(C(KC_DEL));
                     } else if (layer_state_is(_QWERTY)) layer_on(_SWAP); // This toggle OSL(_SWAP)
                     else if (layer_state_is(_SWAP)) {
-                        del_mods(MOD_BIT(KC_LCTL));
                         tap_code(KC_QUOT);
-                        if (mods == MOD_BIT(KC_LCTL)) layer_off(_SWAP); // Turn layer _SWAP off if only KC_LCTL mod key is pressed
+                        if (mods == MOD_BIT(KC_LCTL)) layer_off(_SWAP); // Turn layer _SWAP off if only MD_LCTL key is pressed
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
-                unregister_code(KC_LCTL);
                 tabbing = false;
                 mod_before_layer = false;
                 other_key_pressed = true;
             } break;
         case MD_RCTL:
             if (record -> event.pressed) {
-                other_key_pressed = false;
                 if (layer_state_is(_NUMP)) mod_after_layer = true;
+                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_RCTL);
             } else {
+                unregister_code(KC_RCTL);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     // mod_before_layer is for triggering quick-rolling MD_RCTL(▼) ⟶ LT_NUMP(▼) or LT_RNAV(▼) ⟶ MD_RCTL(▲)
                     // which then trigger C(KC_BSPC) or C(KC_DEL)
                     if (mod_before_layer) {
-                        if (layer_state_is(_NUMP)) tap_code(KC_BSPC);
-                        else if (layer_state_is(_NAVI)) tap_code(KC_DEL);
+                        if (layer_state_is(_NUMP)) tap_code16(C(KC_BSPC));
+                        else if (layer_state_is(_NAVI)) tap_code16(C(KC_DEL));
                     } else {
-                        del_mods(MOD_BIT(KC_RCTL));
                         tap_code(KC_QUOT);
                         if (layer_state_is(_SWAP) && (mods == MOD_BIT(KC_RCTL))) layer_off(_SWAP);
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
-                unregister_code(KC_RCTL);
                 tabbing = false;
                 mod_before_layer = false;
                 other_key_pressed = true;
             } break;
         case MD_LSFT:
             if (record -> event.pressed) {
-                other_key_pressed = false;
                 if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) mod_after_layer = true;
+                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_LSFT);
             } else {
+                unregister_code(KC_LSFT);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     // mod_after_layer only trigger if the key is pressed in _NUMP or _NAVI layer
                     // which trigger S(KC_9) on MD_LSFT(▲)
                     if (mod_after_layer) {
-                        if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) tap_code(KC_9);
+                        if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) tap_code16(S(KC_9));
                     } else if (layer_state_is(_SWAP)) {
-                        del_mods(MOD_BIT(KC_LSFT));
                         tap_code(KC_EQL);
                         if (mods == MOD_BIT(KC_LSFT)) layer_off(_SWAP);
                     } else if (get_autoshift_state() && layer_state_is(_QWERTY)) caps_word_toggle();
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
-                unregister_code(KC_LSFT);
                 mod_before_layer = false;
                 other_key_pressed = true;
             } break;
         case MD_RSFT:
             if (record -> event.pressed) {
-                other_key_pressed = false;
                 if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) mod_after_layer = true;
+                other_key_pressed = false;
                 key_timer = timer_read();
                 register_code(KC_RSFT);
             } else {
+                unregister_code(KC_RSFT);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
                     // mod_after_layer only trigger if the key is pressed in _NUMP or _NAVI layer
                     // which trigger S(KC_0) on MD_RSFT(▲)
                     if (mod_after_layer) {
-                        if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) tap_code(KC_0);
+                        if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) tap_code16(S(KC_0));
                     } else {
-                        del_mods(MOD_BIT(KC_RSFT));
                         tap_code(KC_EQL);
                         if (layer_state_is(_SWAP) && (mods == MOD_BIT(KC_RSFT))) layer_off(_SWAP);
                     }
                 } else if (layer_state_is(_SWAP)) layer_off(_SWAP); // Turn layer _SWAP off after hold-then-release this button
 
-                unregister_code(KC_RSFT);
                 mod_before_layer = false;
                 other_key_pressed = true;
             } break;
@@ -246,7 +236,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (mods & MOD_BIT(KC_LGUI)) {
                     other_key_pressed = true;
                     if (layer_state_is(_NUMP)) tap_code16(A(C(KC_LEFT))); // SylphyHornEx shortcut to move current window to the left desktop
-                    else tap_code16(C(KC_LEFT));
+                    else tap_code16(C(KC_LEFT)); // Switch to left desktop
                     return false;
                 }
 
@@ -279,13 +269,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record -> event.pressed) {
                 if (mods & MOD_BIT(KC_LGUI)) {
                     other_key_pressed = true;
-                    tap_code16(C(KC_RGHT));
+                    tap_code16(C(KC_RGHT)); // Switch to right desktop
                     return false;
                 }
 
                 other_key_pressed = layer_state_is(_NAVI) ? true : false;
-                // mod_before_layer checking point
-                if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
+                if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true; // Check if holding CTRL or SHIFT mod
                 key_timer = timer_read();
                 layer_on(_NUMP);
                 update_tri_layer(_NUMP, _NAVI, _MOUS);
@@ -316,8 +305,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LT_RNAV:
             if (record -> event.pressed) {
                 other_key_pressed = layer_state_is(_NUMP) ? true : false;
-                // mod_before_layer checking point
-                if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true;
+                if (mods & (MOD_MASK_CTRL | MOD_MASK_SHIFT)) mod_before_layer = true; // Check if holding CTRL or SHIFT mod
                 key_timer = timer_read();
                 layer_on(_NAVI);
                 update_tri_layer(_NUMP, _NAVI, _MOUS);
