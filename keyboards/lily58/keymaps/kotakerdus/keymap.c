@@ -1,5 +1,5 @@
 // Author      : kotakerdus
-// Version     : 0.3.6
+// Version     : 0.3.7
 // OS          : Windows 10
 // Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
 //               - Snipaste (screenshot app that is able to pin the screenshot on screen. KC_F13 as its shortcut)
@@ -194,7 +194,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 unregister_code(KC_LSFT);
                 if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
-                    if (mod_after_layer) {
+                    if (mod_before_layer) {
+                        // mod_before_layer checks on quick-rolling MD_LSFT(▼) ⟶ LT_NUMP(▼)/LT_RNAV(▼) ⟶ MD_LSFT(▲)
+                        if      (layer_state_is(_NUMP)) tap_code16(S(KC_BSPC));
+                        else if (layer_state_is(_NAVI)) tap_code16(S(KC_DEL));
+                    } else if (mod_after_layer) {
                         // mod_after_layer checks if the key is pressed in _NUMP or _NAVI layer
                         if (layer_state_is(_NUMP) || layer_state_is(_NAVI)) tap_code16(S(KC_9));
                     } else if (layer_state_is(_SWAP)) {
@@ -473,7 +477,7 @@ void render_master(void) {
     static const char PROGMEM mod_alt[2][3]        = {{ 0x1b, 0x1c, 0 }, { 0x3b, 0x3c, 0 }};
     static const char PROGMEM mod_ctrl[2][3]       = {{ 0x59, 0x5a, 0 }, { 0x79, 0x7a, 0 }};
     static const char PROGMEM mod_shift[2][3]      = {{ 0x5b, 0x5c, 0 }, { 0x7b, 0x7c, 0 }};
-    static const char PROGMEM mod_auto[2][3]       = {{ 0x9b, 0x9c, 0 }, { 0xbb, 0xbc, 0 }};
+    // static const char PROGMEM mod_auto[2][3]       = {{ 0x9b, 0x9c, 0 }, { 0xbb, 0xbc, 0 }};
     static const char PROGMEM mod_shift_auto[2][3] = {{ 0x99, 0x9a, 0 }, { 0xb9, 0xba, 0 }};
 
     // Start render ------------------------
@@ -500,24 +504,12 @@ void render_master(void) {
     oled_write_P(mods & MOD_MASK_ALT  ? mod_alt[1]  : mod_blank, false);
     oled_write_P(mods & MOD_MASK_CTRL ? mod_ctrl[0] : mod_blank, false);
     oled_advance_char();
-    if (get_autoshift_state()) {
-        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift_auto[0], false);
-        else                       oled_write_P(mod_auto[0], false);
-    } else {
-        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift[0], false);
-        else                       oled_write_P(mod_blank, false);
-    }
-
+    if (get_autoshift_state()) oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift_auto[0] : mod_blank, false);
+    else                       oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift[0]      : mod_blank, false);
     oled_write_P(mods & MOD_MASK_CTRL ? mod_ctrl[1] : mod_blank, false);
     oled_advance_char();
-
-    if (get_autoshift_state()) {
-        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift_auto[1], false);
-        else                       oled_write_P(mod_auto[1], false);
-    } else {
-        if (mods & MOD_MASK_SHIFT) oled_write_P(mod_shift[1], false);
-        else                       oled_write_P(mod_blank, false);
-    }
+    if (get_autoshift_state()) oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift_auto[1] : mod_blank, false);
+    else                       oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift[1]      : mod_blank, false);
 
     // End of render -----------------------
 }
