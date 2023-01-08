@@ -6,22 +6,24 @@
 #define OLED_FADE_OUT
 #define OLED_FADE_OUT_INTERVAL 3
 
-#define TAPPING_TERM 150
-#define AUTO_SHIFT_TIMEOUT 200
-#define CAPS_WORD_IDLE_TIMEOUT 0
+#define TAPPING_TERM 175
+#define HOLD_ON_OTHER_KEY_PRESS
+#define TAPPING_FORCE_HOLD
+#define AUTO_SHIFT_TIMEOUT 175
 
-// Liyang's fork on Kinetic Mouse
-// Using Liyang's mousekey.c & mousekey.h custom build
-// https://github.com/liyang/qmk_firmware/blob/develop/kinetic/docs/feature_mouse_keys.md
-#define MK_VARIANT MK_TYPE_KINETIC
-#define MK_KINETIC_WHEEL_MAXS 3
+#define MOUSEKEY_INERTIA
+#define MOUSEKEY_DELAY 10
+#define MOUSEKEY_INTERVAL 16
+#define MOUSEKEY_MAX_SPEED 28
+#define MOUSEKEY_TIME_TO_MAX 28
+#define MOUSEKEY_FRICTION 12
+#define MOUSEKEY_MOVE_DELTA 1
 
 #undef OLED_FONT_H
 #define OLED_FONT_H "keyboards/lily58/keymaps/kotakerdus/glcdfont_kotakerdus.c"
 
 // Optimization - https://docs.qmk.fm/#/squeezing_avr
 #define NO_ACTION_ONESHOT
-#define NO_ACTION_TAPPING
 #define NO_MUSIC_MODE
 #define LAYER_STATE_8BIT
 #undef LOCKING_SUPPORT_ENABLE
