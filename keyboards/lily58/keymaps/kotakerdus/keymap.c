@@ -5,16 +5,17 @@
 // Description : Custom lily58 keyboard designed with left hand + mouse in mind, useful for work that demands on mouse usage like Blender,
 //               Photoshop and many other design application. This layout has _SWAP layer that work like default OSL which useful for trigger
 //               a shortcut but won't end the OSL state if still holding a MOD keys
-// Features    : - Auto Shift for numbers and symbols but not alphas
-//               - Easy access to numpad keys which can be accessed by holding LT_NUMP
-//               - Mouse layer by holding LT_MOUS and send KC_ENT if tapped
-//               - Quick close app via by pressing KC_LCTL while in ALT-TAB windows selection and quickly move current window to next monitor
-//                 by pressing KC_ESC while holding SW_LSWP key
-//               - One-shot swapped key layout on the left side by pressing SW_LSWP key once and it won't break out of one-shot state if
-//                 pressed together with MOD key, useful for repeated shortcut key (i.e. CTRL + Y)
-// Useful Apps : - RamonUnch AltSnap (window management app, ie: resize/move window anywhere within the window content)
+// Features    : - Auto Shift for numbers and symbols but not alphas (can be toggled)
+//               - Easy access to numpad keys complete with number operators, comma, dot, equal symbol and aphostrophe  within _NUMPAD layer
+//                 which can be accessed by holding LT_NUMP key
+//               - Mouse layer by holding both LT_NUMP and LT_RNAV
+//               - Quick close app via by pressing KC_LCTL while in ALT-TAB windows selection (windows only)
+//               - Move current active window to next monitor by pressing KC_ESC while holding SW_LSWP key
+//               - One-shot swap layout on the left side by pressing SW_LSWP key once and it won't break out of one-shot state if pressed
+//                 together with MOD key, useful for repeated shortcut key (e.g. CTRL + Y)
+// Useful Apps : - RamonUnch AltSnap (window management app, e.g. resize/move window anywhere within the window content + mouse keys)
 //               - Snipaste (quick screenshot app that is able to pin the screenshot on screen)
-//               - ViRb3 SylphyHornEx (windows's task view management app, ie: move window to right desktop view)
+//               - ViRb3 SylphyHornEx (windows's task view management app, e.g. move window to right desktop view)
 
 #include QMK_KEYBOARD_H
 enum layer_number {
@@ -26,12 +27,14 @@ enum layer_number {
 
 // KC_ESC                         // G(S(KC_RGHT)) if SW_LSWP tapped (move current window to next monitor) | S(KC_TAB) in tabbing mode
 #define SP_SNIP KC_F13            // Snipaste screenshot shortcut
+
 #define SW_LSWP LGUI_T(XXXXXXX)   // LGUI_T(OSL(_SWAP)) | Can be hold-and-press KC_LALT or LT_NUMP to move between desktops
 #define SW_RSWP RGUI_T(XXXXXXX)
 #define SW_RCTL RCTL_T(KC_QUOT)
 #define SW_RSFT RSFT_T(KC_EQL)
 #define SW_NUMP LT(_NUMP, KC_DEL)
-#define NM_LALT LALT_T(KC_MPRV)
+
+#define NM_LALT LALT_T(KC_MPRV)   // Media control keys along with NM_LGUI and KC_MPLY (in KC_SPC spot)
 #define NM_LGUI LGUI_T(KC_MNXT)
 #define LT_NUMP LT(_NUMP, KC_BSPC)
 #define LT_LNAV LT(_LNAV, KC_DEL)
@@ -50,7 +53,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              KC_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KC_LALT, SW_LSWP, LT_NUMP, KC_SPC ,       SC_SENT, LT_RNAV, KC_RGUI, KC_RALT
+                                        KC_LALT, SW_LSWP, LT_NUMP, KC_SPC ,       KC_ENT , LT_RNAV, KC_RGUI, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -64,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              SW_RSFT, KC_SLSH, KC_DOT , KC_COMM, KC_M   , KC_N   , KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KC_RALT, SW_RSWP, SW_NUMP, SC_SENT,       _______, _______, _______, _______
+                                        KC_RALT, SW_RSWP, SW_NUMP, KC_ENT ,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -86,7 +89,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
              KC_SLEP, KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_VOLU, KC_PGUP, KC_UP  , XXXXXXX, KC_F11 ,                         _______, _______, _______, _______, _______, _______,
+             AS_TOGG, KC_VOLU, KC_PGUP, KC_UP  , XXXXXXX, KC_F11 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
@@ -112,13 +115,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUS] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_ESC , XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_INS ,
+             KC_ESC , XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_NUM ,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         XXXXXXX, KC_WH_L, KC_WH_U, KC_WH_R, XXXXXXX, KC_SCRL,
+             SP_SNIP, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         XXXXXXX, KC_WH_L, KC_WH_U, KC_WH_R, XXXXXXX, KC_INS ,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LCTL, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         XXXXXXX, KC_BTN1, KC_BTN3, KC_BTN2, XXXXXXX, KC_PSCR,
+             KC_LCTL, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         XXXXXXX, KC_BTN1, KC_BTN3, KC_BTN2, XXXXXXX, KC_SCRL,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, KC_BTN4, KC_WH_D, KC_BTN5, XXXXXXX, KC_NUM ,
+             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, KC_BTN4, KC_WH_D, KC_BTN5, XXXXXXX, KC_PSCR,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         KC_LALT, KC_LGUI, _______, _______,       _______, _______, KC_RGUI, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -128,6 +131,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // C U S T O M   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 bool tabbing = false;
+bool otherKeyPressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods = get_mods();
     switch (keycode) {
@@ -136,11 +140,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (tabbing) {
                     tap_code16(S(KC_TAB));
                     return false;
-                } else if (mods & MOD_MASK_GUI) {
+                } else if (mods == MOD_BIT(KC_LGUI)) {
                     tap_code16(S(KC_RGHT)); // G(S(KC_RGHT)) - Move current window to next monitor
                     return false;
                 } else if (layer_state_is(_QWERTY) && (mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT))) {
-                    // MOD + KC_ESC (KC_LALT + KC_ESC) still can be performed in _MOUS layer
+                    // MOD + KC_ESC (e.g. KC_LALT + KC_ESC) still can be performed in _MOUS layer
                     tap_code(KC_GRV);
                     return false;
                 }
@@ -174,7 +178,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record -> tap.count && record -> event.pressed) {
                 layer_invert(_SWAP);
                 return false;
-            } else if (layer_state_is(_SWAP) && (mods & MOD_MASK_GUI)) layer_off(_SWAP);
+            } else if (layer_state_is(_SWAP) && (mods & MOD_MASK_GUI)) layer_off(_SWAP); // Exit _SWAP layer after holding it in _SWAP layer
             break;
         case SW_RCTL:
         case SW_RSFT:
