@@ -1,18 +1,19 @@
 // Author      : kotakerdus
-// Version     : 0.4.4
+// Version     : 0.4.5
 // Keyboard    : lily58
 // OS          : Windows 10
 // Description : Custom lily58 keyboard designed with left hand + mouse in mind, useful for work that demands on mouse usage like Blender,
 //               Photoshop and many other design application. This layout has _SWAP layer that work like default OSL which useful for trigger
-//               a shortcut but won't end the OSL state if still holding a MOD keys
+//               a shortcut but it won't end the OSL state if still holding a MOD keys
 // Features    : - Auto Shift for numbers and symbols but not alphas (can be toggled)
+//               - Caps Word for easy code typing by pressing KC_LSFT once
 //               - Easy access to numpad keys complete with number operators, comma, dot, equal symbol and aphostrophe  within _NUMPAD layer
 //                 which can be accessed by holding LT_NUMP key
-//               - Mouse layer by holding both LT_NUMP and LT_RNAV
-//               - Quick close app via by pressing KC_LCTL while in ALT-TAB windows selection (windows only)
+//               - Mouse layer by holding LT_MOUS key which also act as KC_ENT if tapped
+//               - Quick close app via by pressing KC_ESC while in ALT-TAB windows selection (windows only)
 //               - Move current active window to next monitor by pressing KC_ESC while holding SW_LSWP key
-//               - One-shot swap layout on the left side by pressing SW_LSWP key once and it won't break out of one-shot state if pressed
-//                 together with MOD key, useful for repeated shortcut key (e.g. CTRL + Y)
+//               - One-shot swap layout on the left side by pressing KC_LCTL once and it won't leave the OSL state if pressed together with
+//                 MOD key, useful for repeated shortcut key (e.g. CTRL + Y)
 // Useful Apps : - RamonUnch AltSnap (window management app, e.g. resize/move window anywhere within the window content + mouse keys)
 //               - Snipaste (quick screenshot app that is able to pin the screenshot on screen)
 //               - ViRb3 SylphyHornEx (windows's task view management app, e.g. move window to right desktop view)
@@ -24,21 +25,17 @@ enum layer_number {
 };
 
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
-
-// KC_ESC                         // G(S(KC_RGHT)) if SW_LSWP tapped (move current window to next monitor) | S(KC_TAB) in tabbing mode
+// KC_ESC                         // G(S(KC_RGHT)) if  +SW_LSWP tapped (move current window to next monitor) | KC_DEL in alt-tabbing mode
 #define SP_SNIP KC_F13            // Snipaste screenshot shortcut
-
-#define SW_LSWP LGUI_T(XXXXXXX)   // LGUI_T(OSL(_SWAP)) | Can be hold-and-press KC_LALT or LT_NUMP to move between desktops
-#define SW_RSWP RGUI_T(XXXXXXX)
 #define SW_RCTL RCTL_T(KC_QUOT)
 #define SW_RSFT RSFT_T(KC_EQL)
 #define SW_NUMP LT(_NUMP, KC_DEL)
-
-#define NM_LALT LALT_T(KC_MPRV)   // Media control keys along with NM_LGUI and KC_MPLY (in KC_SPC spot)
+#define NM_LALT LALT_T(KC_MPRV)
 #define NM_LGUI LGUI_T(KC_MNXT)
 #define LT_NUMP LT(_NUMP, KC_BSPC)
 #define LT_LNAV LT(_LNAV, KC_DEL)
 #define LT_RNAV LT(_RNAV, KC_DEL)
+#define LT_MOUS LT(_MOUS, KC_ENT)
 
 // K E Y M A P S |------------------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +50,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              KC_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , KC_LBRC,       KC_RBRC, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_EQL ,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KC_LALT, SW_LSWP, LT_NUMP, KC_SPC ,       KC_ENT , LT_RNAV, KC_RGUI, KC_RALT
+                                        KC_LALT, KC_LGUI, LT_NUMP, KC_SPC ,       LT_MOUS, LT_RNAV, KC_RGUI, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -67,7 +64,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              SW_RSFT, KC_SLSH, KC_DOT , KC_COMM, KC_M   , KC_N   , KC_RBRC,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        KC_RALT, SW_RSWP, SW_NUMP, KC_ENT ,       _______, _______, _______, _______
+                                        KC_RALT, KC_RGUI, SW_NUMP, LT_MOUS,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -91,9 +88,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              AS_TOGG, KC_VOLU, KC_PGUP, KC_UP  , XXXXXXX, KC_F11 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
+             KC_LCTL, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, KC_VOLD, KC_PGDN, KC_HOME, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
+             KC_LSFT, KC_VOLD, KC_PGDN, KC_HOME, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         _______, _______, _______, _______,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -131,41 +128,51 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // C U S T O M   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
 bool tabbing = false;
-bool otherKeyPressed = false;
+uint16_t key_timer = 0;
+bool other_key_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods = get_mods();
     switch (keycode) {
         case KC_ESC:
-            if (record -> event.pressed) {
-                if (tabbing) {
-                    tap_code16(S(KC_TAB));
-                    return false;
-                } else if (mods == MOD_BIT(KC_LGUI)) {
-                    tap_code16(S(KC_RGHT)); // G(S(KC_RGHT)) - Move current window to next monitor
-                    return false;
-                } else if (layer_state_is(_QWERTY) && (mods & (MOD_MASK_ALT | MOD_MASK_CTRL | MOD_MASK_SHIFT))) {
-                    // MOD + KC_ESC (e.g. KC_LALT + KC_ESC) still can be performed in _MOUS layer
-                    tap_code(KC_GRV);
-                    return false;
-                }
-            } break;
         case KC_TAB:
+            other_key_pressed = true;
             if (record -> event.pressed) {
-                if (mods & (MOD_MASK_ALT | MOD_MASK_CTRL)) tabbing = true;
+                if (keycode == KC_TAB && (mods & (MOD_BIT(KC_LALT)))) tabbing = true;
+                else if (keycode == KC_ESC) {
+                    if (tabbing) {
+                        tap_code(KC_DEL);
+                        return false;
+                    } else if (mods == MOD_BIT(KC_LGUI)) {
+                        // G(S(KC_RGHT)) - Move current window to next monitor
+                        tap_code16(S(KC_RGHT));
+                        return false;
+                    } else if (layer_state_is(_QWERTY) && (mods & (MOD_BIT(KC_LALT) | MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT)))) {
+                        // MOD + KC_ESC (e.g. KC_LALT + KC_ESC) still can be performed in _MOUS layer
+                        tap_code(KC_GRV);
+                        return false;
+                    }
+                }
             } break;
         case KC_LCTL:
+        case KC_LSFT:
             if (record -> event.pressed) {
-                if (tabbing) {
-                    tap_code(KC_DEL);
-                    return false;
+                key_timer = timer_read();
+                 // This prevent quick-rolling key on both KC_LCTL and KC_LSFT which could trigger both the layer_on(_SWAP) and Caps Word
+                if (!(mods & (MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT)))) other_key_pressed = false;
+            } else {
+                if (!other_key_pressed && timer_elapsed(key_timer) < TAPPING_TERM) {
+                    if (layer_state_is(_QWERTY)) {
+                        if      (keycode == KC_LCTL) layer_on(_SWAP);
+                        else if (keycode == KC_LSFT) caps_word_toggle();
+                    }
                 }
-            } else if (tabbing && (mods & MOD_BIT(KC_LCTL))) tabbing = false; // Prevent turn the 'tabbing' state off while alt-tabbing
-            break;
+            } break;
         case KC_LALT:
         case NM_LALT:
         case LT_NUMP:
+            other_key_pressed = true;
             if (record -> event.pressed) {
-                if (mods & (MOD_MASK_GUI)) {
+                if (mods & MOD_BIT(KC_LGUI)) {
                     if      (keycode == KC_LALT) tap_code16(C(KC_LEFT));    // G(C(KC_LEFT))    - Switch to left desktop
                     else if (keycode == NM_LALT) tap_code16(A(C(KC_LEFT))); // G(A(C(KC_LEFT))) - Move window to left desktop (SylphyHornEx)
                     else if (keycode == LT_NUMP) tap_code16(C(KC_RGHT));    // G(C(KC_RGHT))    - Switch to right desktop
@@ -173,39 +180,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             } else if (keycode == KC_LALT && tabbing) tabbing = false;
             break;
-        case SW_LSWP:
-        case SW_RSWP:
-            if (record -> tap.count && record -> event.pressed) {
-                layer_invert(_SWAP);
-                return false;
-            } else if (layer_state_is(_SWAP) && (mods & MOD_MASK_GUI)) layer_off(_SWAP); // Exit _SWAP layer after holding it in _SWAP layer
-            break;
-        case SW_RCTL:
-        case SW_RSFT:
-        case KC_RALT:
-        case KC_RGUI:
-            if (!(record -> event.pressed)) {
-                if (layer_state_is(_SWAP)) {
-                    if      (keycode == KC_RGUI && !(mods & (MOD_MASK_ALT  | MOD_MASK_CTRL | MOD_MASK_SHIFT))) layer_off(_SWAP);
-                    else if (keycode == KC_RALT && !(mods & (MOD_MASK_CTRL | MOD_MASK_GUI  | MOD_MASK_SHIFT))) layer_off(_SWAP);
-                    else if (keycode == SW_RCTL && !(mods & (MOD_MASK_ALT  | MOD_MASK_GUI  | MOD_MASK_SHIFT))) layer_off(_SWAP);
-                    else if (keycode == SW_RSFT && !(mods & (MOD_MASK_ALT  | MOD_MASK_GUI  | MOD_MASK_CTRL)))  layer_off(_SWAP);
-                }
-            } break;
         default:
-            if (!(record -> event.pressed)) {
-                if (layer_state_is(_SWAP)) {
-                    // Break out from _SWAP layer if no other mod keys are being held
-                    if (!(mods & (MOD_MASK_ALT | MOD_MASK_GUI | MOD_MASK_CTRL | MOD_MASK_SHIFT))) layer_off(_SWAP);
-                }
+            other_key_pressed = true;
+            if (!(record -> event.pressed) && layer_state_is(_SWAP)) {
+                // Exit _SWAP layer if no other mod keys are being held
+                if (!(mods)) layer_off(_SWAP);
+                else if (keycode == SW_RCTL && (mods & MOD_MASK_CTRL))  layer_off(_SWAP);
+                else if (keycode == SW_RSFT && (mods & MOD_MASK_SHIFT)) layer_off(_SWAP);
+                else if (keycode == KC_RALT && (mods & MOD_MASK_ALT))   layer_off(_SWAP);
+                else if (keycode == KC_RGUI && (mods & MOD_MASK_GUI))   layer_off(_SWAP);
             } break;
     }
 
     return true;
-}
-
-layer_state_t layer_state_set_user(layer_state_t state) {
-    return update_tri_layer_state(state, _NUMP, _RNAV, _MOUS);
 }
 
 // A U T O  S H I F T |-------------------------------------------------------------------------------------------------------------------------
@@ -215,11 +202,13 @@ bool get_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         // Only enable AutoShift on these keys
         case KC_1 ... KC_0:
-        case KC_MINUS ... KC_SLASH:
+        case KC_MINUS ... KC_QUOTE:
+        case KC_COMMA ... KC_SLASH:
         case KC_NONUS_BACKSLASH:
             return true;
         // Don't AutoShift these keys
         case KC_A ... KC_Z:
+        case KC_GRAVE:
         case KC_TAB:
             return false;
     }
@@ -256,6 +245,34 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
         case KC_PENT: unregister_code16((!shifted) ? KC_PENT : KC_EQL);  break;
         case KC_PDOT: unregister_code16((!shifted) ? KC_PDOT : KC_COMM);  break;
         default: unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
+}
+
+// C A P S  W O R D |---------------------------------------------------------------------------------------------------------------------------
+// https://docs.qmk.fm/#/feature_caps_word
+
+bool caps_word_press_user(uint16_t keycode) {
+    switch (keycode) {
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
+            return true;
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_P1 ... KC_P0:
+        case KC_RGHT ... KC_UP:
+        case KC_MINS ... KC_SLSH:
+        case KC_LCTL ... KC_LGUI:
+        case LT_NUMP:
+        case LT_LNAV:
+        case LT_RNAV:
+        case KC_LPRN:
+        case KC_RPRN:
+        case SC_LSPO:
+            return true;
+        // Other key will deactive the Caps Word.
+        default:
+            return false;
     }
 }
 
@@ -323,8 +340,8 @@ void render_master(void) {
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
-    if ((host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK))) oled_write_P(separator[1], false);
-    else                                                   oled_write_P(separator[0], false);
+    if ((host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) || is_caps_word_on()) oled_write_P(separator[1], false);
+    else                                                                        oled_write_P(separator[0], false);
 
     // Layer names
     if      (layer_state_is(_MOUS))                          oled_write_P(layer_state[4], false);
