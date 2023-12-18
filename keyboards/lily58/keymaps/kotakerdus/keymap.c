@@ -10,22 +10,23 @@
 //                 which can be accessed by holding LT_NUMP key
 //               - Mouse layer by holding MO_MOUS key
 //               - Quick close app via by pressing KC_ESC while in ALT-TAB windows selection (windows only)
-//               - Move current active window to next monitor by pressing KC_ESC while holding SW_LSWP key
+//               - Move current active window to next monitor by pressing KC_SPC while holding SW_LSWP key
 //               - One-shot swap layout for the left side by pressing SW_LSWP once and it won't leave the OSL state if pressed together with
 //                 MOD key, useful for repeated shortcut key (e.g. CTRL + Y)
 // Useful Apps : - RamonUnch AltSnap (window management app, e.g. resize/move window anywhere within the window content + mouse keys)
 //               - Snipaste (quick screenshot app that is able to pin the screenshot on screen)
-//               - ViRb3 SylphyHornEx (windows's task view management app, e.g. move window to right desktop view)
+//               - hwtnb SylphyHornPluWin11 (windows's virtual desktop management app, e.g. move window to right desktop view)
 
 #include QMK_KEYBOARD_H
 enum layer_number {
-    _QWERTY = 0,
+    _QWER = 0,
     _SWAP, _NUMP, _LNAV, _RNAV, _MOUS
 };
 
 // D E F I N E   K E Y C O D E S |--------------------------------------------------------------------------------------------------------------
 
-// KC_ESC                         // SW_LSWP + KC_ESC = G(S(KC_RGHT)) (move current window to next monitor) | KC_DEL in alt-tabbing mode
+// KC_ESC                         // Any MOD key + KC_ESC = MOD + KC_GRV | KC_DEL in alt-tabbing mode
+// KC_SPC                         // SW_LSWP + KC_ESC = G(S(KC_RGHT)) (move current window to next monitor)
 #define SP_SNIP KC_F13            // Snipaste screenshot shortcut
 #define SW_LSWP LGUI_T(XXXXXXX)   // LGUI_T(OSL(_SWAP)) | Can be hold-and-press KC_LALT or LT_NUMP to switch between virtual desktops
 #define SW_RSWP RGUI_T(XXXXXXX)
@@ -37,12 +38,13 @@ enum layer_number {
 #define LT_NUMP LT(_NUMP, KC_BSPC)
 #define LT_LNAV LT(_LNAV, KC_DEL)
 #define LT_RNAV LT(_RNAV, KC_DEL)
+#define MT_CTNM LCTL_T(KC_NUM)
 #define MO_MOUS MO(_MOUS)
 
 // K E Y M A P S |------------------------------------------------------------------------------------------------------------------------------
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_QWERTY] = LAYOUT (
+    [_QWER] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
              KC_ESC , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   ,                         KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_BSLS,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -76,27 +78,27 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              SP_SNIP, KC_PDOT, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             _______, LT_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
+             MT_CTNM, KC_P0  , KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             SC_LSPO, KC_P0  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
+             SC_LSPO, LT_LNAV, KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         NM_LALT, NM_LGUI, _______, KC_MPLY,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
-    [_LNAV] = LAYOUT (
-        // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_SLEP, KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 ,                         _______, _______, _______, _______, _______, _______,
-        // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             AS_TOGG, KC_VOLU, KC_PGUP, KC_UP  , XXXXXXX, KC_F11 ,                         _______, _______, _______, _______, _______, _______,
-        // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LCTL, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
-        // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LSFT, KC_VOLD, KC_PGDN, KC_HOME, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
-        // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        _______, _______, _______, _______,       _______, _______, _______, _______
-        //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
-    ),
+    // [_LNAV] = LAYOUT (
+    //     // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
+    //          KC_SLEP, KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 ,                         _______, _______, _______, _______, _______, _______,
+    //     // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
+    //          KC_TAB , KC_VOLU, KC_PGUP, KC_UP  , XXXXXXX, KC_F11 ,                         _______, _______, _______, _______, _______, _______,
+    //     // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
+    //          KC_LCTL, _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_F12 ,                         _______, _______, _______, _______, _______, _______,
+    //     // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
+    //          KC_LSFT, KC_VOLD, KC_PGDN, KC_HOME, KC_END , KC_ENT , _______,       _______, _______, _______, _______, _______, _______, _______,
+    //     // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
+    //                                     KC_LALT, KC_LGUI, _______, _______,       _______, _______, _______, _______
+    //     //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
+    // ),
 
     [_RNAV] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
@@ -114,13 +116,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_MOUS] = LAYOUT (
         // ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐     ┌────────┬────────┬────────┬────────┬────────┬────────┬────────┐
-             KC_ESC , XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_NUM ,
+             KC_ESC , XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             SP_SNIP, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         XXXXXXX, KC_WH_L, KC_WH_U, KC_WH_R, XXXXXXX, KC_INS ,
+             SP_SNIP, XXXXXXX, XXXXXXX, KC_MS_U, XXXXXXX, XXXXXXX,                         XXXXXXX, KC_WH_L, KC_WH_U, KC_WH_R, XXXXXXX, XXXXXXX,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LCTL, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         XXXXXXX, KC_BTN1, KC_BTN3, KC_BTN2, XXXXXXX, KC_SCRL,
+             KC_LCTL, XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_R, XXXXXXX,                         XXXXXXX, KC_BTN1, KC_BTN3, KC_BTN2, XXXXXXX, XXXXXXX,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, KC_BTN4, KC_WH_D, KC_BTN5, XXXXXXX, KC_PSCR,
+             KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,       XXXXXXX, XXXXXXX, KC_BTN4, KC_WH_D, KC_BTN5, XXXXXXX, XXXXXXX,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         KC_LALT, KC_LGUI, _______, _______,       _______, _______, KC_RGUI, KC_RALT
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
@@ -140,14 +142,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     if (tabbing) {
                         tap_code(KC_DEL); // Close window while in ALT-TAB in Windows
                         return false;
-                    } else if (mods == MOD_BIT(KC_LGUI)) {
-                        tap_code16(S(KC_RGHT)); // G(S(KC_RGHT)) - Move current window to next monitor
-                        return false;
-                    } else if (layer_state_is(_QWERTY) && (mods & (MOD_BIT(KC_LALT) | MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT)))) {
-                        tap_code(KC_GRV); // MOD + KC_ESC (e.g. KC_LALT + KC_ESC) still can be performed in _MOUS layer
+                    } else if (layer_state_is(_QWER) && (mods & (MOD_BIT(KC_LALT) | MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT) | MOD_BIT(KC_LGUI)))) {
+                        tap_code(KC_GRV); // For MOD + KC_ESC (e.g. KC_LALT + KC_ESC) can be triggered in _MOUS layer
                         return false;
                     }
                 } else if (keycode == KC_TAB && (mods & (MOD_BIT(KC_LALT)))) tabbing = true;
+            } break;
+        case KC_SPC:
+            if (record -> event.pressed) {
+                if (mods == MOD_BIT(KC_LGUI)) {
+                    tap_code16(S(KC_RGHT)); // G(S(KC_RGHT)) - Move current window to next monitor
+                    return false;
+                }
             } break;
         case SW_LSWP:
         case SW_RSWP:
@@ -280,11 +286,11 @@ void render_master(void) {
           0xdf, 0x5d, 0x5e, 0x5f, 0xdf, 0 }  // Caps   (1)
     };
     static const char PROGMEM layer_state[5][6] = {
-        { 0x14, 0x15, 0x16, 0x17, 0x18, 0 }, // QWERT  (0)
-        { 0x34, 0x35, 0x36, 0x37, 0x38, 0 }, // SWAP   (1)
-        { 0x54, 0x55, 0x56, 0x57, 0x58, 0 }, // NUMPAD (2)
-        { 0x74, 0x75, 0x76, 0x77, 0x78, 0 }, // NAVI   (3)
-        { 0x94, 0x95, 0x96, 0x97, 0x98, 0 }  // MOUSE  (4)
+        { 0x14, 0x15, 0x16, 0x17, 0x18, 0 }, // QWER        (0)
+        { 0x34, 0x35, 0x36, 0x37, 0x38, 0 }, // SWAP        (1)
+        { 0x54, 0x55, 0x56, 0x57, 0x58, 0 }, // NUMP        (2)
+        { 0x74, 0x75, 0x76, 0x77, 0x78, 0 }, // LNAV / RNAV (3)
+        { 0x94, 0x95, 0x96, 0x97, 0x98, 0 }  // MOUS        (4)
     };
 
     static const char PROGMEM mod_blank[]          = { 0xdf, 0xdf, 0 };
@@ -294,7 +300,7 @@ void render_master(void) {
     static const char PROGMEM mod_shift[2][3]      = {{ 0x5b, 0x5c, 0 }, { 0x7b, 0x7c, 0 }};
     static const char PROGMEM mod_shift_auto[2][3] = {{ 0x99, 0x9a, 0 }, { 0xb9, 0xba, 0 }};
 
-    // Start render ------------------------------------------------------------------------------------------
+    // Start render -------------------------------------------------------------------------------
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
@@ -325,7 +331,7 @@ void render_master(void) {
     if (get_autoshift_state()) oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift_auto[1] : mod_blank, false);
     else                       oled_write_P(mods & MOD_MASK_SHIFT ? mod_shift[1]      : mod_blank, false);
 
-    // End of render ---------------------------------------------------------------------------------------
+    // End of render ------------------------------------------------------------------------------
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
