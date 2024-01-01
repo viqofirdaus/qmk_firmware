@@ -1,11 +1,12 @@
 // Author      : kotakerdus
-// Version     : 0.4.7
+// Version     : 0.4.8
 // Keyboard    : lily58
 // OS          : Windows 10
 // Description : Custom lily58 keyboard designed with left hand + mouse in mind, useful for work that demands on mouse usage like Blender,
 //               Photoshop and many other design application. This layout has _SWAP layer that work like default OSL which useful for trigger
 //               a shortcut but it won't end the OSL state if still holding a MOD keys
 // Features    : - Auto Shift for numbers and symbols but not alphas (can be toggled)
+//               - Caps Word for easy code typing by pressing KC_LSFT twice
 //               - Easy access to numpad keys complete with number operators, comma, dot, equal symbol and aphostrophe within _NUMP layer which
 //                 can be accessed by holding LT_NUMP key
 //               - Ergonomic mouse layer by holding LT_MOUS key and if tapped it will send KC_ENT
@@ -77,8 +78,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              SP_SNIP, KC_PDOT, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-        // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              MT_LCTL, LT_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
+        // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
              SC_LSPO, KC_P0  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
                                         MT_LALT, MT_LGUI, _______, KC_MPLY,       _______, _______, _______, _______
@@ -234,6 +235,38 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
     }
 }
 
+#ifdef CAPS_WORD_ENABLE
+
+// C A P S  W O R D |---------------------------------------------------------------------------------------------------------------------------
+// https://docs.qmk.fm/#/feature_caps_word
+
+bool caps_word_press_user(uint16_t keycode) {
+    switch (keycode) {
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
+            return true;
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_P1 ... KC_P0:
+        case KC_RGHT ... KC_UP:
+        case KC_MINS ... KC_SLSH:
+        case MODIFIER_KEYCODE_RANGE:
+        case LT_NUMP:
+        case LT_LNAV:
+        case LT_RNAV:
+        case KC_LPRN:
+        case KC_RPRN:
+        case SC_LSPO:
+            return true;
+        // Other key will deactive the Caps Word.
+        default:
+            return false;
+    }
+}
+
+#endif // CAPS_WORD_ENABLE
+
 #ifdef OLED_ENABLE
 
 // O L E D   I N T E R F A C E |----------------------------------------------------------------------------------------------------------------
@@ -299,8 +332,8 @@ void render_master(void) {
 
     // Lily58 logo and CAPS/divider section
     oled_write_P(lily58, false);
-    if (host_keyboard_led_state().caps_lock) oled_write_P(separator[1], false);
-    else                                     oled_write_P(separator[0], false);
+    if (host_keyboard_led_state().caps_lock || is_caps_word_on()) oled_write_P(separator[1], false);
+    else                                                          oled_write_P(separator[0], false);
 
     // Layer names
     if      (layer_state_is(_MOUS))                          oled_write_P(layer_state[4], false);
