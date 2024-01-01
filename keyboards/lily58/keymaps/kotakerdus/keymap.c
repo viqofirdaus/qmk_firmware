@@ -177,35 +177,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 else if (keycode == SW_RSFT && (mods & MOD_MASK_SHIFT)) layer_off(_SWAP);
                 else if (keycode == KC_RALT && (mods & MOD_MASK_ALT))   layer_off(_SWAP);
                 else if (keycode == KC_RGUI && (mods & MOD_MASK_GUI))   layer_off(_SWAP);
-            } break;
+            }
     }
 
     return true;
 }
 
+#ifdef AUTO_SHIFT_ENABLE
+
 // A U T O  S H I F T |-------------------------------------------------------------------------------------------------------------------------
-
-bool get_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        // Only enable AutoShift on these keys
-        case KC_1 ... KC_0:
-        case KC_MINUS ... KC_QUOTE:
-        case KC_COMMA ... KC_SLASH:
-        case KC_NONUS_BACKSLASH:
-            return true;
-        // Don't AutoShift these keys
-        case KC_A ... KC_Z:
-        case KC_GRAVE:
-        case KC_TAB:
-            return false;
-    }
-
-    return get_custom_auto_shifted_key(keycode, record);
-}
 
 bool get_custom_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
     switch(keycode) {
-        case KC_PMNS ... KC_PENT: // KC_PMNS, KC_PPLS, KC_PENT
+        case KC_PMNS:
+        case KC_PPLS:
+        case KC_PENT:
         case KC_PDOT:
             return true;
         default:
@@ -234,6 +220,8 @@ void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record)
         default: unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
     }
 }
+
+#endif // AUTO_SHIFT_ENABLE
 
 #ifdef CAPS_WORD_ENABLE
 
