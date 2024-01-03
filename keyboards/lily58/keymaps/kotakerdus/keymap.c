@@ -33,13 +33,14 @@ enum layer_number {
 #define SW_RCTL RCTL_T(KC_QUOT)
 #define SW_RSFT RSFT_T(KC_EQL)
 #define SW_NUMP LT(_NUMP, KC_DEL)
+#define NM_LCTL LCTL_T(KC_NUM)
+#define NM_LSFT SC_LSPO
+#define NM_LALT LALT_T(KC_MPRV)
+#define NM_LGUI LGUI_T(KC_MNXT)
+#define NM_LNAV LT(_LNAV, KC_DEL)
 #define LT_NUMP LT(_NUMP, KC_BSPC)
-#define LT_LNAV LT(_LNAV, KC_DEL)
 #define LT_RNAV LT(_RNAV, KC_DEL)
 #define LT_MOUS LT(_MOUS, KC_ENT)
-#define MT_LCTL LCTL_T(KC_NUM)
-#define MT_LALT LALT_T(KC_MPRV)
-#define MT_LGUI LGUI_T(KC_MNXT)
 
 // K E Y M A P S |------------------------------------------------------------------------------------------------------------------------------
 
@@ -78,11 +79,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
              SP_SNIP, KC_PDOT, KC_P7  , KC_P8  , KC_P9  , KC_PPLS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┤        │     │        ├────────┼────────┼────────┼────────┼────────┼────────┤
-             MT_LCTL, LT_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
+             NM_LCTL, NM_LNAV, KC_P4  , KC_P5  , KC_P6  , KC_PMNS,                         _______, _______, _______, _______, _______, _______,
         // ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-             SC_LSPO, KC_P0  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
+             NM_LSFT, KC_P0  , KC_P1  , KC_P2  , KC_P3  , KC_PENT, KC_RPRN,       _______, _______, _______, _______, _______, _______, _______,
         // └────────┴────────┴────────┼────────┼────────┼────────┼────────┤     ├────────┼────────┼────────┼────────┼────────┴────────┴────────┘
-                                        MT_LALT, MT_LGUI, _______, KC_MPLY,       _______, _______, _______, _______
+                                        NM_LALT, NM_LGUI, _______, KC_MPLY,       _______, _______, _______, _______
         //                            └────────┴────────┴────────┴────────┘     └────────┴────────┴────────┴────────┘
     ),
 
@@ -241,11 +242,11 @@ bool caps_word_press_user(uint16_t keycode) {
         case KC_MINS ... KC_SLSH:
         case MODIFIER_KEYCODE_RANGE:
         case LT_NUMP:
-        case LT_LNAV:
         case LT_RNAV:
+        case NM_LSFT:
+        case NM_LNAV:
         case KC_LPRN:
         case KC_RPRN:
-        case SC_LSPO:
             return true;
         // Other key will deactive the Caps Word.
         default:
